@@ -13,8 +13,11 @@ export interface TurmaInterface {
 
 export interface HabitoInterface {
     id ?: string,
-    titulo?: string,
-    tipo?: string,
+    titulo: string,
+    horario: Date,
+    recorrencia: string,
+    diasDaSemana?: Array<string>,
+    diaMes?: Date,
 }
 
 export interface UserInterface {

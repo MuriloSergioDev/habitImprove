@@ -13,7 +13,7 @@ type Props = {
 
 const Home = ({ }: Props) => {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
 
     function navigateToLogin() {
         navigation.navigate('Login');
@@ -33,7 +33,7 @@ const Home = ({ }: Props) => {
                 style={styles.layer}
             >
                 <View style={styles.container}>
-                    
+
                     <View style={styles.buttonBox}>
 
 

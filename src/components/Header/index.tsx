@@ -5,7 +5,7 @@ import { Image, View } from 'react-native';
 import styles from './style';
 
 const Header = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
 
     function navigateBack() {
         navigation.goBack();

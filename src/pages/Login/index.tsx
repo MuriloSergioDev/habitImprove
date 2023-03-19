@@ -20,7 +20,7 @@ const Login = ({}: Props) => {
     password: "",
   });
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [modalAlertVisible, setModalAlertVisible] = useState(false);
   const [messageAlert, setMessageAlert] = useState("");
 
@@ -29,7 +29,7 @@ const Login = ({}: Props) => {
   }
 
   function navigateToRecoverPassword() {
-    navigation.navigate("RecoverPassword");
+    navigation.navigate("Profile");
   }
 
   async function handleLogin() {

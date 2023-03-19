@@ -1,10 +1,8 @@
-import React from 'react';
-import { useState } from 'react';
-import { TouchableOpacity, Text } from 'react-native';
-import { View } from 'react-native';
-import styles from './style';
 import { FontAwesome } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import styles from './style';
 
 type Props = {
     setDate: Function,
@@ -46,7 +44,7 @@ const DatePicker = ({ setDate, value, color = 'white'}: Props) => {
                         // <View style={[styles.container, {backgroundColor: '#10f1f0'}]}>
                         <View style={styles.container}>
                             <FontAwesome name="calendar" size={24} color="black" />
-                            <Text style={ {color: color, marginLeft: 10}}>Selecione a data</Text>                            
+                            <Text style={ {color: color, marginLeft: 10}}>Selecione a data</Text>
                         </View>
                         :
                         <View>

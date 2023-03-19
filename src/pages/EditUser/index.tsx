@@ -11,7 +11,7 @@ import styles from "./styles";
 type Props = {};
 
 const EditUser = ({}: Props) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [modalAlertVisible, setModalAlertVisible] = useState(false);
   const [messageAlert, setMessageAlert] = useState("");
   const turmasTemp = [];

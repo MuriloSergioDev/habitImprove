@@ -17,17 +17,17 @@ type Props = {
 
 const SignUp = ({ }: Props) => {
 
-    const navigation = useNavigation();
-    const [modalAlertVisible, setModalAlertVisible] = useState(false);    
+    const navigation = useNavigation<any>();
+    const [modalAlertVisible, setModalAlertVisible] = useState(false);
     const [comfirmPassword, setComfirmPassword] = useState('');
     const [messageAlert, setMessageAlert] = useState('');
     const [user, setUser] = useState<UserInterface>(
         {
             name: '',
             email: '',
-            password: '',                        
+            password: '',
         }
-    )    
+    )
 
     async function handleSignUp() {
 
@@ -43,12 +43,12 @@ const SignUp = ({ }: Props) => {
                         uid: response.user.uid,
                         name: user.name,
                         email: user.email,
-                        password: user.password,                                                
+                        password: user.password,
                     }
 
                     const docRef = doc(db, "users", response.user.uid);
-                    setDoc(docRef, data, { merge: true });                    
-                    
+                    setDoc(docRef, data, { merge: true });
+
                     setMessageAlert('Cadastro realizado com sucesso')
                     setModalAlertVisible(true)
                 }
@@ -56,7 +56,7 @@ const SignUp = ({ }: Props) => {
             catch (error) {
                 setMessageAlert('Erro ao realizar cadastro')
                 setModalAlertVisible(true)
-                console.log(error);                
+                console.log(error);
                 //alert(error)
             }
         } else {
@@ -64,7 +64,7 @@ const SignUp = ({ }: Props) => {
             setModalAlertVisible(true)
         }
 
-    }    
+    }
 
     function navigateBack() {
         navigation.goBack();
@@ -92,10 +92,10 @@ const SignUp = ({ }: Props) => {
                         }}>
                         {modalIcon}
                     </AlertModal>
-                    
+
                     <View style={styles.inputBox}>
                         {/* @ts-ignore */}
-                        
+
                         <TextInput
                             theme={{
                                 colors: {
@@ -158,7 +158,7 @@ const SignUp = ({ }: Props) => {
                             value={comfirmPassword}
                             onChangeText={(value => setComfirmPassword(value))}
                         />
-                    </View>                    
+                    </View>
 
                     <View style={styles.buttonContainer}>
                         <View style={styles.buttonBox}>
@@ -171,7 +171,7 @@ const SignUp = ({ }: Props) => {
                         </View>
                         <View style={styles.buttonBox}>
                             <Button
-                                color='black'                            
+                                color='black'
                                 textColor='white'
                                 label="JÁ POSSUO CONTA"
                                 onPress={() => { navigateBack() }}></Button>

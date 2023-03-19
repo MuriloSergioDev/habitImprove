@@ -1,12 +1,12 @@
-import React, { ReactNode } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
-import styles from './styles';
 import { Feather } from '@expo/vector-icons';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { useNavigation } from '@react-navigation/native';
+import React, { ReactNode } from 'react';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { TouchableHighlight } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { db } from '../../config/Firebase';
 import { UserInterface } from '../../interface/interface';
+import styles from './styles';
 
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
 
 const StudentModal = ({ user, colorStatus = "black", onPress, children, showAlertModalSucess, showAlertModalFail }: Props) => {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
 
 
     // useEffect(() => {

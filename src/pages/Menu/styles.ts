@@ -1,6 +1,5 @@
-import { StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
-import { Dimensions } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
     container: {
@@ -12,10 +11,10 @@ export default StyleSheet.create({
     contentBox: {
         flex: 1,
         paddingTop: 130,
-        backgroundColor: 'white',        
+        backgroundColor: 'white',
         borderTopRightRadius:80,
         borderTopLeftRadius:80,
-        width: '100%',        
+        width: '100%',
     },
     nav: {
         backgroundColor: '#FE9D2A',
@@ -42,7 +41,7 @@ export default StyleSheet.create({
     icon: {
         height: 50,
         width: 50,
-        resizeMode: "contain",        
+        resizeMode: "contain",
         marginRight: 20,
     },
     input: {
@@ -67,11 +66,11 @@ export default StyleSheet.create({
         marginTop: 'auto',
         marginBottom: 20
     },
-    buttonMenuBox: {      
+    buttonMenuBox: {
         justifyContent: 'space-between',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        width: Dimensions.get('window').width * 0.85,        
+        width: Dimensions.get('window').width * 0.85,
     },
     menuBox: {
         flexDirection: 'row',
@@ -102,21 +101,21 @@ export default StyleSheet.create({
 
     placarBoxItem:{
         marginBottom: 18,
-        fontSize:16,        
+        fontSize:16,
     },
 
     textBlack:{
         color: 'black',
-    },    
+    },
     contentBoxText:{
-        fontWeight: '200',
+        fontWeight: '400',
         fontSize: 18,
         marginLeft: 20,
     },
     scroll: {
         width: Dimensions.get('window').width,
     },
-    endLine:{        
+    endLine:{
         height: 10,
     }
 });

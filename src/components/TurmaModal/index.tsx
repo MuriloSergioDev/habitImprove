@@ -1,13 +1,12 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
-import styles from './style'
-import { Feather } from '@expo/vector-icons';
+import { AntDesign, Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { Alert, Text, TouchableOpacity, View } from 'react-native';
+import { TouchableHighlight } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { TurmaInterface } from '../../interface/interface';
 import { db } from '../../config/Firebase';
-import { AntDesign } from '@expo/vector-icons';
+import { TurmaInterface } from '../../interface/interface';
+import styles from './style';
 
 type Props = {
     turma?: TurmaInterface
@@ -19,7 +18,7 @@ type Props = {
 
 const TurmaModal = ({ turma, colorStatus = "black", onPress, showAlertModalSucess, showAlertModalFail }: Props) => {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
 
     function handleTurmaDelete() {
         console.log('deletar aluno')

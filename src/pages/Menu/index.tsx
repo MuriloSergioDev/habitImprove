@@ -1,29 +1,23 @@
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { signOut } from "firebase/auth";
 import React, { useContext } from "react";
 import { Image, SafeAreaView, Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import HabitCheckBox from "../../components/HabitCheckBox";
-import { auth } from "../../config/Firebase";
 import AuthContext from "../../context/auth";
 import styles from "./styles";
 
-const Menu = ({ route }) => {
-  const navigation = useNavigation();
+const Menu = ({ route }: any) => {
+  const navigation = useNavigation<any>();
 
-  const { user } = useContext(AuthContext);
+  const { user, signed, logOut } = useContext(AuthContext);
 
   function navigateBack() {
     navigation.goBack();
   }
 
-  function handleSignOut() {    
-      signOut(auth)
-      .then(() => {
-        navigateBack();
-      })
-      .catch((error) => {});
+  async function handleSignOut() {
+    await logOut();
   }
 
   return (
@@ -59,8 +53,8 @@ const Menu = ({ route }) => {
           <ScrollView style={styles.scroll}>
             <HabitCheckBox habitoNome="Acordar 5h" duracao="Indefinida"></HabitCheckBox>
             <HabitCheckBox habitoNome="Acordar 5h" duracao="Indefinida"></HabitCheckBox>
-            <HabitCheckBox habitoNome="Acordar 5h" duracao="Indefinida"></HabitCheckBox>                 
-            <View style={styles.endLine}></View>                               
+            <HabitCheckBox habitoNome="Acordar 5h" duracao="Indefinida"></HabitCheckBox>
+            <View style={styles.endLine}></View>
           </ScrollView>
         </View>
       </View>

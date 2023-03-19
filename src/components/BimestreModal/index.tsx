@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, Text } from 'react-native';
-import styles from './style'
 import { Ionicons } from '@expo/vector-icons';
-import Button from '../Button'
 import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import { Text, View } from 'react-native';
 import { UserInterface } from '../../interface/interface';
+import Button from '../Button';
+import styles from './style';
 
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
 
 const BimestreModal = ({ onPress, permission, user }: Props) => {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
 
     function navigateToListStudents() {
         if (permission === 1) {

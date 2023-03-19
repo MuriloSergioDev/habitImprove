@@ -1,22 +1,26 @@
-import React, { createContext, useState } from "react";
-import { UserInterface } from "../interface/interface";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { db, auth } from "../config/Firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { createContext, useState } from "react";
+import { auth, db } from "../config/Firebase";
+import { UserInterface } from "../interface/interface";
 
 interface AuthContextData {
   signed: boolean;
   user: UserInterface;
   signIn(user: string, password: string): Promise<void | string>;
-  signOut(): void;
+  logOut(): void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export const AuthProvider = ({ children }) => {
+type Props = {  
+  children: JSX.Element[],
+};
+
+export const AuthProvider = ({ children } : Props) => {
   const [user, setUser] = useState<UserInterface | null>(null);
 
-  async function signIn(user, password) {
+  async function signIn(user : string, password: string) {
     try {
       const response = await signInWithEmailAndPassword(auth, user, password);
       if (response.user.uid && response.user.emailVerified) {
@@ -42,10 +46,18 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  async function signOut() {}
+  async function logOut() {    
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      console.log("Deslogado com sucesso");
+    }).catch((error) => {
+      // An error happened.
+      console.log("Erro ao deslogar");
+    });
+  }
 
   return (
-    <AuthContext.Provider value={{ signed: !!user, user: {}, signIn, signOut }}>
+    <AuthContext.Provider value={{ signed: !!user, user: {}, signIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );

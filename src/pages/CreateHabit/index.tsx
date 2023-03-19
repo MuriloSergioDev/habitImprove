@@ -1,143 +1,279 @@
-import { useNavigation } from '@react-navigation/native';
-import React from 'react';
-import { Text, Image } from 'react-native';
-import { View } from 'react-native';
-import styles from './styles'
-import { Feather } from '@expo/vector-icons';
-import { useState } from 'react';
-import DatePicker from '../../components/DatePicker';
-import { TextInput } from 'react-native-paper';
-import { HabitoInterface, TurmaInterface } from '../../interface/interface';
-import AlertModal from '../../components/AlertModal';
-import { AntDesign } from '@expo/vector-icons';
-import { db } from '../../config/Firebase';
-import { Foundation } from '@expo/vector-icons';
-import Button from '../../components/Button';
-import NumericInput from 'react-native-numeric-input'
+import { AntDesign, Feather, Foundation } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Checkbox, Divider, TextInput } from "react-native-paper";
+import AlertModal from "../../components/AlertModal";
+import Button from "../../components/Button";
+import { HabitoInterface } from "../../interface/interface";
+import styles from "./styles";
 
-type Props = {
+type Props = {};
 
-}
+const CreateHabit = ({}: Props) => {
+  const navigation = useNavigation<any>();
 
-const CreateHabit = ({ }: Props) => {
+  const [messageAlert, setMessageAlert] = useState("");
+  const [modalAlertVisible, setModalAlertVisible] = useState(false);
+  const [habito, setHabito] = useState<HabitoInterface>({
+    titulo: "",
+    horario: new Date(),
+    recorrencia: "d",
+    diasDaSemana: [],
+  });
 
-    const navigation = useNavigation();
+  const [checked, setChecked] = React.useState(false);
 
-    const [messageAlert, setMessageAlert] = useState('');
-    const [habito, setHabito] = useState<HabitoInterface>({
-        titulo: '',
-        tipo: 'd'
-    })
-    const [dateInicio, setDateInicio] = useState("")
-    const [dateFim, setDateFim] = useState("")
-    const [modalAlertVisible, setModalAlertVisible] = useState(false);
+  const days = Array.from({ length: 31 }, (_, i) => ({
+    label: `${i + 1}`,
+    value: `${i + 1}`,
+  }));
+  const filteredDays = days.filter((day) => parseInt(day.value) <= 28);
 
-    function navigateBack() {
-        navigation.goBack();
-    }
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showTime, setShowTime] = useState(false);
+  const [daysOfWeek, setDaysOfWeek] = useState([
+    { name: "Segunda", selected: false },
+    { name: "Terça", selected: false },
+    { name: "Quarta", selected: false },
+    { name: "Quinta", selected: false },
+    { name: "Sexta", selected: false },
+    { name: "Sábado", selected: false },
+    { name: "Domingo", selected: false },
+  ]);
 
-    function navigateToMenu() {
-        navigation.navigate('Menu');
-    }
+  const onChangeTime = (event: any, selectedTime: Date) => {
+    const currentTime = selectedTime || habito.horario;
 
-    async function handleCreateNewTurma() {
+    setShowTime(true);
+    setHabito((prevState) => {
+      return { ...prevState, horario: currentTime };
+    });
+    setShowTimePicker(false);
+  };
 
-        try {
+  const showTimepicker = () => {
+    setShowTimePicker(true);
+  };
 
-            if (habito.titulo && dateInicio && dateFim) {
+  function navigateBack() {
+    navigation.goBack();
+  }
 
-                // const refTurma = db.collection('turmas')
-                //     .doc()
+  function navigateToMenu() {
+    navigation.navigate("Menu");
+  }
 
-                // const data = {
-                //     id: refTurma.id,
-                //     title: turma.title,
-                //     start: dateInicio,
-                //     end: dateFim,
-                //     status: turma.status,
-                // }
-                // refTurma.set(data, { merge: true });
-
-                //console.log(refTurma.id)
-
-                setMessageAlert('Hábito criado com sucesso')
-                setModalAlertVisible(true)
-            } else {
-                setMessageAlert('Preencha todos os campos')
-                setModalAlertVisible(true)
-            }
-
-
-
+  useEffect(() => {
+    function handleDaysOfWeekChange(newDaysOfWeek: any[]) {
+      let diaSemana: string[] = [];
+      newDaysOfWeek.map((day) => {
+        if (day.selected == true) {
+          diaSemana.push(day.name);
         }
-        catch (error) {
-            setMessageAlert('Erro ao criar hábito')
-            setModalAlertVisible(true)
-            //alert(error)
-        }
+      });
+
+      setHabito((prevState) => {
+        return { ...prevState, diasDaSemana: diaSemana };
+      });
     }
 
-    let modalIcon = messageAlert == 'Hábito criado com sucesso' ? <AntDesign name="checkcircle" size={24} color="green" /> : <Foundation name="alert" size={24} color="#e6d927" />
+    handleDaysOfWeekChange(daysOfWeek);
+  }, [daysOfWeek]);
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.nav}>
-                <View style={styles.navUp}>                    
-                    <Text style={styles.navUpText}>Novo Hábito</Text>
-                </View>
+  async function handleCreateNewHabito() {
+    try {
+      if (habito.titulo) {
+        // const refTurma = db.collection('turmas')
+        //     .doc()
 
-            </View>
+        // const data = {
+        //     titulo: turma.title,
+        //     start: dateInicio,
+        //     end: dateFim,
+        //     status: turma.status,
+        // }
+        // refTurma.set(data, { merge: true });
 
-            <AlertModal
-                header={messageAlert}
-                comfirmationString='Ok'
-                isVisible={modalAlertVisible}
-                close={() => {
-                    setModalAlertVisible(false)
-                    if (messageAlert == 'Hábito criado com sucesso') {
-                        navigateToMenu()
-                    }
-                }}>
-                {modalIcon}
-            </AlertModal>
+        // console.log(refTurma.id)
+        console.log("====================================");
+        console.log(habito);
+        console.log("====================================");
 
-            <View style={styles.navDown}>
-            {/* @ts-ignore */}
-            <TextInput
-            theme={{
-              colors: {
-                placeholder: "#FE9D2A",
-                text: "#c0c2c4",
-                primary: "#c0c2c4",
-                outline: "#c0c2c4",
-              },
-              roundness: 10,
-            }}
-            style={styles.input}
-            mode="outlined"
-            placeholder="Titulo"
-            value={habito.titulo}
-            onChangeText={(value) =>
-              setHabito((prevState) => {
-                return { ...prevState, titulo: value };
-              })
-            }            
-          />
-          
-          <NumericInput onChange={value => console.log(value)} />
+        setMessageAlert("Hábito criado com sucesso");
+        setModalAlertVisible(true);
+      } else {
+        setMessageAlert("Preencha todos os campos");
+        setModalAlertVisible(true);
+      }
+    } catch (error) {
+      setMessageAlert("Erro ao criar hábito");
+      setModalAlertVisible(true);
+      //alert(error)
+    }
+  }
 
-          <Button
-            color="#FE9D2A"
-            underlayColor="#e69026"
-            textColor="white"
-            label="Salvar"
+  let modalIcon =
+    messageAlert == "Hábito criado com sucesso" ? (
+      <AntDesign name="checkcircle" size={24} color="green" />
+    ) : (
+      <Foundation name="alert" size={24} color="#e6d927" />
+    );
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.nav}>
+        <View style={styles.navUp}>
+          <Feather
+            name="arrow-left"
+            size={30}
+            color="white"
             onPress={() => {
-              
+              navigateBack();
             }}
-          ></Button>
-            </View>
+          />
+          <Text style={styles.navUpText}>Novo Hábito</Text>
         </View>
-    )
-}
+      </View>
+
+      <AlertModal
+        header={messageAlert}
+        comfirmationString="Ok"
+        isVisible={modalAlertVisible}
+        close={() => {
+          setModalAlertVisible(false);
+          if (messageAlert == "Hábito criado com sucesso") {
+            navigateToMenu();
+          }
+        }}
+      >
+        {modalIcon}
+      </AlertModal>
+
+      <View style={styles.navDown}>
+        {/* @ts-ignore */}
+        <TextInput
+          theme={{
+            colors: {
+              placeholder: "#FE9D2A",
+              text: "#c0c2c4",
+              primary: "#c0c2c4",
+              outline: "#c0c2c4",
+            },
+            roundness: 10,
+          }}
+          style={styles.input}
+          mode="outlined"
+          placeholder="Titulo"
+          value={habito.titulo}
+          onChangeText={(value) =>
+            setHabito((prevState) => {
+              return { ...prevState, titulo: value };
+            })
+          }
+        />
+        <View style={styles.boxRow}>
+          <View style={styles.boxRep}>
+            <Text>Horário:</Text>
+            <TouchableOpacity onPress={showTimepicker}>
+              {showTime ? (
+                <Text>
+                  {habito.horario.toLocaleTimeString().substring(0, 5)}
+                </Text>
+              ) : (
+                <Text>Escolha um horário</Text>
+              )}
+            </TouchableOpacity>
+            {showTimePicker && (
+              <DateTimePicker
+                testID="timePicker"
+                value={habito.horario}
+                mode="time"
+                is24Hour={true}
+                display="default"
+                onChange={onChangeTime}
+              />
+            )}
+          </View>
+          <View style={styles.boxRep}>
+            <Text>Recorrência:</Text>
+            <Picker
+              selectedValue={habito.recorrencia}
+              style={{ height: 50, width: 200 }}
+              onValueChange={(itemValue, itemIndex) =>
+                setHabito((prevState) => {
+                  return { ...prevState, recorrencia: itemValue };
+                })
+              }
+            >
+              <Picker.Item label="Diária" value="d" />
+              <Picker.Item label="Semanal" value="s" />
+              <Picker.Item label="Mensal" value="m" />
+            </Picker>
+          </View>
+          {habito.recorrencia == "m" ? (
+            <View style={styles.boxRep}>
+              <Text>Dia do mês:</Text>
+              <Picker
+                selectedValue={habito.diaMes}
+                style={{ height: 50, width: 200 }}
+                onValueChange={(itemValue, itemIndex) =>
+                  setHabito((prevState) => {
+                    return { ...prevState, diaMes: itemValue };
+                  })
+                }
+              >
+                {filteredDays.map((day, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={day.label}
+                    value={day.value}
+                  />
+                ))}
+              </Picker>
+            </View>
+          ) : null}
+          {habito.recorrencia == "s" ? (
+            <View style={styles.boxRep}>
+              <View>
+                {daysOfWeek.map((day, index) => (
+                  <View key={index}>
+                    <View style={styles.checkboxContainer}>
+                      <Checkbox
+                        status={day.selected ? "checked" : "unchecked"}
+                        onPress={() => {
+                          const updatedDaysOfWeek = [...daysOfWeek];
+                          updatedDaysOfWeek[index] = {
+                            ...day,
+                            selected: !day.selected,
+                          };
+                          setDaysOfWeek(updatedDaysOfWeek);
+                        }}
+                      />
+                      <Text style={styles.label}>{day.name}</Text>
+                    </View>
+                    <Divider />
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : null}
+        </View>
+        <Button
+          color="#FE9D2A"
+          underlayColor="#e69026"
+          textColor="white"
+          label="Salvar"
+          onPress={() => {
+            handleCreateNewHabito();
+          }}
+        ></Button>
+      </View>
+    </View>
+  );
+};
 
 export default CreateHabit;
