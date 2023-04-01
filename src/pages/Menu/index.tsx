@@ -25,7 +25,7 @@ const Menu = ({ route }: any) => {
       <View style={styles.container}>
         <View style={styles.nav}>
           <Text style={styles.text}>
-            Olá <Text style={styles.textBlack}>{user.name}João</Text>
+            Olá <Text style={styles.textBlack}>{user?.name}</Text>
           </Text>
           <Image
             style={styles.icon}

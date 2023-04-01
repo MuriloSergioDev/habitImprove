@@ -6,14 +6,14 @@ import { UserInterface } from "../interface/interface";
 
 interface AuthContextData {
   signed: boolean;
-  user: UserInterface;
+  user: UserInterface | null;
   signIn(user: string, password: string): Promise<void | string>;
   logOut(): void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-type Props = {  
+type Props = {
   children: JSX.Element[],
 };
 
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children } : Props) => {
     }
   }
 
-  async function logOut() {    
+  async function logOut() {
     signOut(auth).then(() => {
       // Sign-out successful.
       console.log("Deslogado com sucesso");
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children } : Props) => {
   }
 
   return (
-    <AuthContext.Provider value={{ signed: !!user, user: {}, signIn, logOut }}>
+    <AuthContext.Provider value={{ signed: !!user, user: user, signIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );

@@ -18,6 +18,7 @@ export interface HabitoInterface {
     recorrencia: string,
     diasDaSemana?: Array<string>,
     diaMes?: Date,
+    uid?: string
 }
 
 export interface UserInterface {

@@ -2,12 +2,15 @@ import { AntDesign, Feather, Foundation } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { addDoc, collection } from "firebase/firestore";
+import React, { useContext, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Checkbox, Divider, TextInput } from "react-native-paper";
 import AlertModal from "../../components/AlertModal";
 import Button from "../../components/Button";
+import { db } from '../../config/Firebase';
+import AuthContext from "../../context/auth";
 import { HabitoInterface } from "../../interface/interface";
 import styles from "./styles";
 
@@ -16,6 +19,7 @@ type Props = {};
 const CreateHabit = ({}: Props) => {
   const navigation = useNavigation<any>();
 
+  const { user, signed, logOut } = useContext(AuthContext);
   const [messageAlert, setMessageAlert] = useState("");
   const [modalAlertVisible, setModalAlertVisible] = useState(false);
   const [habito, setHabito] = useState<HabitoInterface>({
@@ -24,8 +28,6 @@ const CreateHabit = ({}: Props) => {
     recorrencia: "d",
     diasDaSemana: [],
   });
-
-  const [checked, setChecked] = React.useState(false);
 
   const days = Array.from({ length: 31 }, (_, i) => ({
     label: `${i + 1}`,
@@ -79,6 +81,7 @@ const CreateHabit = ({}: Props) => {
       setHabito((prevState) => {
         return { ...prevState, diasDaSemana: diaSemana };
       });
+
     }
 
     handleDaysOfWeekChange(daysOfWeek);
@@ -87,21 +90,20 @@ const CreateHabit = ({}: Props) => {
   async function handleCreateNewHabito() {
     try {
       if (habito.titulo) {
-        // const refTurma = db.collection('turmas')
-        //     .doc()
 
-        // const data = {
-        //     titulo: turma.title,
-        //     start: dateInicio,
-        //     end: dateFim,
-        //     status: turma.status,
-        // }
-        // refTurma.set(data, { merge: true });
+        const data = {
+            titulo: habito.titulo ?? '',
+            horario: habito.horario ?? '',
+            recorrencia: habito.recorrencia ?? '',
+            diasDaSemana: habito.diasDaSemana ?? '',
+            diaMes: habito.diaMes ?? '',
+            uid: user?.uid ?? ''
+        }
+        console.log(data);
 
-        // console.log(refTurma.id)
-        console.log("====================================");
-        console.log(habito);
-        console.log("====================================");
+
+        const dbRef = collection(db, "habits");
+        addDoc(dbRef, data)
 
         setMessageAlert("Hábito criado com sucesso");
         setModalAlertVisible(true);
@@ -112,6 +114,8 @@ const CreateHabit = ({}: Props) => {
     } catch (error) {
       setMessageAlert("Erro ao criar hábito");
       setModalAlertVisible(true);
+      console.log(error);
+
       //alert(error)
     }
   }
