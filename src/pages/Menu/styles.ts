@@ -114,6 +114,7 @@ export default StyleSheet.create({
     },
     scroll: {
         width: Dimensions.get('window').width,
+        maxHeight: 380,
     },
     endLine:{
         height: 10,

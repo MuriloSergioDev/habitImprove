@@ -49,6 +49,7 @@ export const AuthProvider = ({ children } : Props) => {
   async function logOut() {
     signOut(auth).then(() => {
       // Sign-out successful.
+      setUser(null);
       console.log("Deslogado com sucesso");
     }).catch((error) => {
       // An error happened.

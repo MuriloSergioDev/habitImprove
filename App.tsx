@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import Routes from './src/routes/index';
 import { StatusBar } from 'expo-status-bar';
-import { UserProvider } from './src/context/UserContext';
-import AuthContext from './src/context/auth';
+import moment from 'moment-timezone';
+import React from 'react';
 import { AuthProvider } from './src/context/auth';
+import Routes from './src/routes/index';
 
 const App = () => {
-  
+  moment.tz.setDefault('America/Sao_Paulo');
 
   return (
     <>

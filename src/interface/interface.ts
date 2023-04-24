@@ -14,8 +14,12 @@ export interface TurmaInterface {
 export interface HabitoInterface {
     id ?: string,
     titulo: string,
-    horario: Date,
+    horario: Date | any ,
     recorrencia: string,
+    contador: string,
+    diasSeguidos: string,
+    dataUltimaRealizacao?: Date | any ,
+    dataCriacao ?:  Date | any ,
     diasDaSemana?: Array<string>,
     diaMes?: Date,
     uid?: string
@@ -37,4 +41,9 @@ export interface DesempenhoInterface {
     dificil ?: number
     bimestre ?: number
     turma ?: string
+}
+
+export interface dateFirebase {
+    seconds : string,
+    nanoseconds : string
 }

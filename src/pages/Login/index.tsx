@@ -13,7 +13,6 @@ type Props = {};
 
 const Login = ({}: Props) => {
   const { signed, signIn } = useContext(AuthContext);
-  console.log(signed);
 
   const [user, setUser] = useState({
     email: "",
@@ -33,12 +32,12 @@ const Login = ({}: Props) => {
   }
 
   async function handleLogin() {
-    const response = await signIn(user.email, user.password);  
+    const response = await signIn(user.email, user.password);
     if (response == 'Seu email ainda não foi verificado') {
       setMessageAlert(response);
       setModalAlertVisible(true);
     }
-    
+
   }
 
   let modalIcon =

@@ -14,11 +14,11 @@ import AuthContext from "../../context/auth";
 import { HabitoInterface } from "../../interface/interface";
 import styles from "./styles";
 
-type Props = {};
 
-const CreateHabit = ({}: Props) => {
+const CreateHabit = ({route}: any) => {
   const navigation = useNavigation<any>();
 
+  const { id } = route.params
   const { user, signed, logOut } = useContext(AuthContext);
   const [messageAlert, setMessageAlert] = useState("");
   const [modalAlertVisible, setModalAlertVisible] = useState(false);
@@ -27,6 +27,8 @@ const CreateHabit = ({}: Props) => {
     horario: new Date(),
     recorrencia: "d",
     diasDaSemana: [],
+    contador: '0',
+    diasSeguidos: '0',
   });
 
   const days = Array.from({ length: 31 }, (_, i) => ({
@@ -38,13 +40,13 @@ const CreateHabit = ({}: Props) => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showTime, setShowTime] = useState(false);
   const [daysOfWeek, setDaysOfWeek] = useState([
+    { name: "Domingo", selected: false },
     { name: "Segunda", selected: false },
     { name: "Terça", selected: false },
     { name: "Quarta", selected: false },
     { name: "Quinta", selected: false },
     { name: "Sexta", selected: false },
     { name: "Sábado", selected: false },
-    { name: "Domingo", selected: false },
   ]);
 
   const onChangeTime = (event: any, selectedTime: Date) => {
@@ -87,6 +89,12 @@ const CreateHabit = ({}: Props) => {
     handleDaysOfWeekChange(daysOfWeek);
   }, [daysOfWeek]);
 
+  useEffect(() => {
+    console.log('====================================');
+    console.log(id);
+    console.log('====================================');
+  }, []);
+
   async function handleCreateNewHabito() {
     try {
       if (habito.titulo) {
@@ -97,7 +105,11 @@ const CreateHabit = ({}: Props) => {
             recorrencia: habito.recorrencia ?? '',
             diasDaSemana: habito.diasDaSemana ?? '',
             diaMes: habito.diaMes ?? '',
-            uid: user?.uid ?? ''
+            contador: habito.contador ?? '',
+            diasSeguidos: habito.diasSeguidos ?? '',
+            dataUltimaRealizacao : null,
+            dataCriacao : new Date(),
+            uid: user?.uid ?? '',
         }
         console.log(data);
 
