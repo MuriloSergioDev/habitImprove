@@ -23,6 +23,7 @@ const Menu = ({ route }: any) => {
   const { user, signed, logOut } = useContext(AuthContext);
   const [habitos, setHabitos] = useState<HabitoInterface[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [pontuacao, setPontuacao] = useState(0);
 
   function navigateBack() {
     navigation.goBack();
@@ -50,6 +51,7 @@ const Menu = ({ route }: any) => {
         const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
         const dayOfWeek = daysOfWeek[date.getDay()];
         const dayOfMonth = date.getDate();
+        calculaPontuacao(habitos);
         habitos = habitos.filter((habito)=>{
           if(habito.recorrencia == 'd'){
             return true;
@@ -72,6 +74,15 @@ const Menu = ({ route }: any) => {
       }
     );
     return unsubscribe;
+  }
+
+  function calculaPontuacao(habitos : HabitoInterface[]) {
+    let pontuacao = 0;
+    habitos.forEach((habito: HabitoInterface)=>{
+      pontuacao = pontuacao + (parseInt(habito.contador ?? 0) * parseInt(habito.diasSeguidos ?? 0));
+    })
+
+    setPontuacao(pontuacao);
   }
 
   useEffect(() => {
@@ -107,14 +118,14 @@ const Menu = ({ route }: any) => {
           <View>
             <Text style={styles.placarBoxItem}>Pontuação</Text>
             <Text style={styles.placarBoxItem}>Hábitos</Text>
-            <Text style={styles.placarBoxItem}>Sequência</Text>
+            <Text style={styles.placarBoxItem}>Bônus</Text>
           </View>
           <View>
             <Text style={styles.placarBoxItem}>
-              1000 <AntDesign name="Trophy" size={20} color="black" />
+              {pontuacao} <AntDesign name="Trophy" size={20} color="black" />
             </Text>
             <Text style={styles.placarBoxItem}>{habitos.length}</Text>
-            <Text style={styles.placarBoxItem}>16 dias</Text>
+            <Text style={styles.placarBoxItem}>x1</Text>
           </View>
         </View>
 

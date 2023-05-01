@@ -2,12 +2,12 @@ import { Dimensions, StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
     container: {
-        backgroundColor: '#FBF9F9',        
+        backgroundColor: '#FBF9F9',
         padding: 25,
         height: Dimensions.get('window').width / 4,
         width: Dimensions.get('window').width ,
         marginTop: 20,
-        borderRadius: 60,        
+        borderRadius: 60,
         justifyContent: 'space-between',
         flexDirection:'row',
     },
@@ -35,5 +35,12 @@ export default StyleSheet.create({
     },
     boxText:{
         alignItems:'flex-start',
+    },
+    boxTextItem:{
+        width: '70%',
+        alignItems:'flex-start',
+        flexDirection: 'row',
+        marginTop: 10,
+        justifyContent: 'space-around',
     }
 });

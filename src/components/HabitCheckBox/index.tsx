@@ -8,7 +8,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Alert, Text, View } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { db } from "../../config/Firebase";
@@ -23,6 +23,8 @@ type Props = {
 const HabitCheckBox = ({ habito }: Props) => {
   const { user, signed, logOut } = useContext(AuthContext);
   const [checked, setChecked] = React.useState(false);
+  const [isUpdatedToday, setIsUpdatedToday] = React.useState(false);
+  const [isUpdatedYesterday, setIsUpdatedYesterday] = React.useState(false);
   const hoje = new Date();
   const ontem = new Date(hoje);
   ontem.setDate(hoje.getDate() - 1);
@@ -61,20 +63,22 @@ const HabitCheckBox = ({ habito }: Props) => {
     59
   );
 
-  let isUpdatedToday = false;
-  let isUpdatedYesterday = false;
-  if (habito.dataUltimaRealizacao != null) {
-    habito.dataUltimaRealizacao = new Date(
-      habito.dataUltimaRealizacao.seconds * 1000 +
-        habito.dataUltimaRealizacao.nanoseconds / 1000000
-    );
-    isUpdatedYesterday =
-      habito.dataUltimaRealizacao >= startOfYesterday &&
-      habito.dataUltimaRealizacao <= endOfYesterday;
-    isUpdatedToday =
-      habito.dataUltimaRealizacao >= startOfToday &&
-      habito.dataUltimaRealizacao <= endOfToday;
-  }
+  useEffect(() => {
+    if (habito.dataUltimaRealizacao != null) {
+      habito.dataUltimaRealizacao = new Date(
+        habito.dataUltimaRealizacao.seconds * 1000 +
+          habito.dataUltimaRealizacao.nanoseconds / 1000000
+      );
+      setIsUpdatedYesterday(
+        habito.dataUltimaRealizacao >= startOfYesterday &&
+          habito.dataUltimaRealizacao <= endOfYesterday
+      );
+      setIsUpdatedToday(
+        habito.dataUltimaRealizacao >= startOfToday &&
+          habito.dataUltimaRealizacao <= endOfToday
+      );
+    }
+  }, []);
 
   async function getRealization() {
     const realizationsCollection = collection(db, "realizations");
@@ -96,17 +100,15 @@ const HabitCheckBox = ({ habito }: Props) => {
   }
 
   function getLastDayOfWeek(dayOfWeek: number) {
-    const date = new Date();
-    const lastDayOfMonth = new Date(
-      date.getFullYear(),
-      date.getMonth() + 1,
-      0
-    ).getDate();
-    let lastDay = lastDayOfMonth - ((date.getDay() - dayOfWeek + 7) % 7) - 7;
-    if (lastDay < 1) {
-      lastDay += 7;
+    const today = new Date();
+    let lastDayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    let diff = lastDayDate.getDay() - dayOfWeek;
+    if (diff < 0) diff += 7;
+    lastDayDate.setDate(lastDayDate.getDate() - diff);
+    if (lastDayDate > today) {
+      lastDayDate.setDate(lastDayDate.getDate() - 7);
     }
-    return new Date(date.getFullYear(), date.getMonth(), lastDay);
+    return lastDayDate;
   }
 
   function procuraUltimaRecorrencia(data: HabitoInterface) {
@@ -134,6 +136,9 @@ const HabitCheckBox = ({ habito }: Props) => {
         dia = data.diasDaSemana[index - 1];
       }
     }
+    console.log('====================================');
+    console.log(dia);
+    console.log('====================================');
     const indexDiaSemana = daysOfWeek.indexOf(dia);
     return getLastDayOfWeek(indexDiaSemana);
   }
@@ -146,50 +151,54 @@ const HabitCheckBox = ({ habito }: Props) => {
       });
       data.contador = (parseInt(data.contador) + 1).toString();
 
-      const ultimoDia = procuraUltimaRecorrencia(data);
+      const ultimaOcorrencia = procuraUltimaRecorrencia(data);
 
       const startOfOcorrencia = new Date(
-        ultimoDia.getFullYear(),
-        ultimoDia.getMonth(),
-        ultimoDia.getDate(),
+        ultimaOcorrencia.getFullYear(),
+        ultimaOcorrencia.getMonth(),
+        ultimaOcorrencia.getDate(),
         0,
         0,
         0
       );
       const endOfOcorrencia = new Date(
-        ultimoDia.getFullYear(),
-        ultimoDia.getMonth(),
-        ultimoDia.getDate(),
+        ultimaOcorrencia.getFullYear(),
+        ultimaOcorrencia.getMonth(),
+        ultimaOcorrencia.getDate(),
         23,
         59,
         59
       );
 
-      const dataMesPassado = new Date(hoje.getFullYear(), hoje.getMonth() - 1, hoje.getDate());
+      const dataMesPassado = new Date(
+        hoje.getFullYear(),
+        hoje.getMonth() - 1,
+        hoje.getDate()
+      );
 
       const startOfDataMesPassado = new Date(
-        ultimoDia.getFullYear(),
-        ultimoDia.getMonth(),
-        ultimoDia.getDate(),
+        dataMesPassado.getFullYear(),
+        dataMesPassado.getMonth(),
+        dataMesPassado.getDate(),
         0,
         0,
         0
       );
       const endOfDataMesPassado = new Date(
-        ultimoDia.getFullYear(),
-        ultimoDia.getMonth(),
-        ultimoDia.getDate(),
+        dataMesPassado.getFullYear(),
+        dataMesPassado.getMonth(),
+        dataMesPassado.getDate(),
         23,
         59,
         59
       );
 
-      console.log(dataMesPassado);
-
-      data.dataUltimaRealizacao = new Date(
-        data.dataUltimaRealizacao.seconds * 1000 +
-          data.dataUltimaRealizacao.nanoseconds / 1000000
-      );
+      if(data.dataUltimaRealizacao != null){
+        data.dataUltimaRealizacao = new Date(
+          data.dataUltimaRealizacao.seconds * 1000 +
+            data.dataUltimaRealizacao.nanoseconds / 1000000
+        );
+      }
 
       if (
         data.recorrencia == "d" &&
@@ -204,11 +213,12 @@ const HabitCheckBox = ({ habito }: Props) => {
           data.dataUltimaRealizacao > endOfOcorrencia)
       ) {
         data.diasSeguidos = "0";
-      }else if(data.recorrencia == 'm' &&
-      data.dataUltimaRealizacao != null &&
-      (data.dataUltimaRealizacao < startOfDataMesPassado ||
-        data.dataUltimaRealizacao > endOfDataMesPassado)
-      ){
+      } else if (
+        data.recorrencia == "m" &&
+        data.dataUltimaRealizacao != null &&
+        (data.dataUltimaRealizacao < startOfDataMesPassado ||
+          data.dataUltimaRealizacao > endOfDataMesPassado)
+      ) {
         data.diasSeguidos = "0";
       } else {
         data.diasSeguidos = (parseInt(data.diasSeguidos) + 1).toString();
@@ -217,6 +227,7 @@ const HabitCheckBox = ({ habito }: Props) => {
       await setDoc(docRef, data);
     } catch (error) {
       console.log("Erro ao atualizar habito");
+      console.log(error);
     }
   }
 
@@ -239,7 +250,7 @@ const HabitCheckBox = ({ habito }: Props) => {
       }
 
       atualizaHabito();
-
+      setIsUpdatedToday(true);
       console.log("Realizacao criada com sucesso");
     } catch (error) {
       console.log("Erro ao criar realizacao");
@@ -252,11 +263,15 @@ const HabitCheckBox = ({ habito }: Props) => {
     <View style={[styles.container, styles.shadowProp]}>
       <View style={styles.boxText}>
         <Text style={styles.text}>{habito.titulo}</Text>
-        <Text style={styles.textTime}>Contador: {habito.contador}</Text>
+        <View style={styles.boxTextItem}>
+          <Text style={styles.textTime}>Contador: {habito.contador}</Text>
+          <Text style={styles.textTime}>Sequência: {habito.diasSeguidos}</Text>
+        </View>
       </View>
       <Checkbox
         status={checked || isUpdatedToday ? "checked" : "unchecked"}
         onPress={() => {
+          console.log(isUpdatedToday);
           if (!isUpdatedToday) {
             handleCreateNewRealizacao();
             setChecked(!checked);
