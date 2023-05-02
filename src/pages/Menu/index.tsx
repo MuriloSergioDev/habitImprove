@@ -1,6 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import {
   Image,
@@ -36,7 +36,7 @@ const Menu = ({ route }: any) => {
   function getHabits() {
     const habitsCollection = collection(db, "habits");
     const unsubscribe = onSnapshot(
-      habitsCollection,
+      query(habitsCollection, where("uid", "==", user?.uid)),
       (querySnapshot) => {
         let habitos: any[] = [];
         querySnapshot.forEach((doc) => {

@@ -47,3 +47,12 @@ export interface dateFirebase {
     seconds : string,
     nanoseconds : string
 }
+
+export interface NewsInterface {
+    id ?: string,
+    idUsuario ?: string,
+    reacoes : number,
+    descricao ?: string,
+    comentarios ?: string[],
+    tipo ?: string,
+}

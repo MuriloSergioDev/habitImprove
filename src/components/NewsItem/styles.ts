@@ -4,23 +4,23 @@ export default StyleSheet.create({
     container: {
         backgroundColor: '#FBF9F9',
         padding: 25,
-        height: Dimensions.get('window').width / 4,
+        height: Dimensions.get('window').width / 3.5,
         width: Dimensions.get('window').width ,
         marginTop: 20,
         borderRadius: 60,
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         flexDirection:'row',
     },
     text: {
         fontSize: 18,
         fontWeight: '400',
-        textAlign: 'center',
+        textAlign: 'left',
         color: '#1D6A02',
-        marginLeft: 14,
+        maxWidth: 300
     },
 
     textTime: {
-        fontSize: 12,
+        fontSize: 20,
         fontWeight: '400',
         textAlign: 'center',
     },
@@ -42,6 +42,18 @@ export default StyleSheet.create({
         alignItems:'flex-start',
         flexDirection: 'row',
         marginTop: 10,
-        justifyContent: 'space-around',
-    }
+        justifyContent: 'flex-start',
+    },
+    iconItem:{
+        marginHorizontal: 10
+    },
+    iconFirst:{
+        marginRight: 10
+    },
+    icon: {
+        height: 50,
+        width: 50,
+        resizeMode: "contain",
+        marginRight: 20,
+    },
 });

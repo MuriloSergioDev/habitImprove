@@ -1,8 +1,8 @@
 import {
-    Entypo,
-    FontAwesome,
-    FontAwesome5,
-    Ionicons
+  Entypo,
+  FontAwesome,
+  FontAwesome5,
+  Ionicons
 } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
@@ -11,11 +11,13 @@ import React from "react";
 import TabCreate from "../components/TabCreate";
 import CreateHabit from "../pages/CreateHabit";
 import Menu from "../pages/Menu";
+import Rede from "../pages/Rede";
 
 const AuthRoutes = () => {
   const Tab = createBottomTabNavigator();
   const MenuStack = createStackNavigator();
   const CreateHabitStack = createStackNavigator();
+  const RedeHabitStack = createStackNavigator();
 
   function MenuStackScreen() {
     return (
@@ -37,6 +39,21 @@ const AuthRoutes = () => {
         <CreateHabitStack.Screen
           name="CreateHabit"
           component={CreateHabit}
+          initialParams={{ id: undefined }}
+        />
+      </CreateHabitStack.Navigator>
+    );
+  }
+
+  function RedeStackScreen() {
+    return (
+      <CreateHabitStack.Navigator
+        screenOptions={{ headerShown: false }}
+        initialRouteName="RedeSuporte"
+      >
+        <CreateHabitStack.Screen
+          name="RedeSuporte"
+          component={Rede}
           initialParams={{ id: undefined }}
         />
       </CreateHabitStack.Navigator>
@@ -96,8 +113,8 @@ const AuthRoutes = () => {
           }}
         />
         <Tab.Screen
-          name="Settings 5"
-          component={CreateHabitStackScreen}
+          name="Rede"
+          component={RedeStackScreen}
           options={{
             tabBarLabel: "",
             tabBarIcon: ({focused}) => (
