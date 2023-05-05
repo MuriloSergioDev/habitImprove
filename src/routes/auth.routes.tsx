@@ -9,6 +9,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import TabCreate from "../components/TabCreate";
+import ChatRede from "../pages/ChatRede";
 import CreateHabit from "../pages/CreateHabit";
 import Menu from "../pages/Menu";
 import Rede from "../pages/Rede";
@@ -47,16 +48,22 @@ const AuthRoutes = () => {
 
   function RedeStackScreen() {
     return (
-      <CreateHabitStack.Navigator
+      <RedeHabitStack.Navigator
         screenOptions={{ headerShown: false }}
         initialRouteName="RedeSuporte"
       >
-        <CreateHabitStack.Screen
+        <RedeHabitStack.Screen
           name="RedeSuporte"
           component={Rede}
           initialParams={{ id: undefined }}
         />
-      </CreateHabitStack.Navigator>
+
+        <RedeHabitStack.Screen
+          name="ChatRede"
+          component={ChatRede}
+          initialParams={{ news: undefined }}
+        />
+      </RedeHabitStack.Navigator>
     );
   }
 

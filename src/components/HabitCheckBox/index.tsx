@@ -136,9 +136,6 @@ const HabitCheckBox = ({ habito }: Props) => {
         dia = data.diasDaSemana[index - 1];
       }
     }
-    console.log('====================================');
-    console.log(dia);
-    console.log('====================================');
     const indexDiaSemana = daysOfWeek.indexOf(dia);
     return getLastDayOfWeek(indexDiaSemana);
   }
@@ -271,7 +268,6 @@ const HabitCheckBox = ({ habito }: Props) => {
       <Checkbox
         status={checked || isUpdatedToday ? "checked" : "unchecked"}
         onPress={() => {
-          console.log(isUpdatedToday);
           if (!isUpdatedToday) {
             handleCreateNewRealizacao();
             setChecked(!checked);

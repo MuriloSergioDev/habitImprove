@@ -1,4 +1,5 @@
 import { AntDesign, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import {
   addDoc,
   collection,
@@ -27,6 +28,7 @@ type Props = {
 };
 
 const NewsItem = ({ news }: Props) => {
+  const navigation = useNavigation<any>();
   const { user, signed, logOut } = useContext(AuthContext);
   const [isReacted, setIsReacted] = React.useState(false);
 
@@ -44,6 +46,10 @@ const NewsItem = ({ news }: Props) => {
       maxWidth: 300,
     },
   });
+
+  function navigateToComments() {
+    navigation.navigate('Rede', { screen: 'ChatRede', params: { news: news }});
+  }
 
   async function handleCreateNewReaction() {
     try {
@@ -161,7 +167,9 @@ const NewsItem = ({ news }: Props) => {
             </TouchableOpacity>
           )}
           <Text style={styles.textTime}>{news.reacoes}</Text>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={() => {
+            navigateToComments();
+          }}>
             <Entypo
               name="chat"
               size={24}
@@ -169,7 +177,7 @@ const NewsItem = ({ news }: Props) => {
               style={styles.iconItem}
             />
           </TouchableOpacity>
-          <Text style={styles.textTime}>{news.comentarios?.length}</Text>
+          <Text style={styles.textTime}>{news.comentarios}</Text>
         </View>
       </View>
     </View>

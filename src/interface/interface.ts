@@ -53,6 +53,15 @@ export interface NewsInterface {
     idUsuario ?: string,
     reacoes : number,
     descricao ?: string,
-    comentarios ?: string[],
+    comentarios : number,
     tipo ?: string,
+}
+
+export interface CommentsInterface {
+    id ?: string,
+    idUsuario ?: string,
+    idNews ?: string,
+    mensagem ?: string,
+    nomeUsuario ?: string,
+    dataCriacao ?:  Date | any ,
 }
