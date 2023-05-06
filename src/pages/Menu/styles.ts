@@ -44,6 +44,17 @@ export default StyleSheet.create({
         resizeMode: "contain",
         marginRight: 20,
     },
+    iconCoin: {
+        height: 40,
+        width: 40,
+        resizeMode: "contain",
+    },
+    pontuacaoContainer: {
+        width: 220,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
     input: {
         borderBottomWidth: 2,
         borderBottomColor: '#6556A0',
@@ -88,8 +99,9 @@ export default StyleSheet.create({
         backgroundColor: '#FBF9F9',
         zIndex: 10,
         borderRadius: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-around'
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     shadowProp: {
         shadowColor: '#171717',
@@ -100,8 +112,7 @@ export default StyleSheet.create({
     },
 
     placarBoxItem:{
-        marginBottom: 18,
-        fontSize:16,
+        fontSize:17,
     },
 
     textBlack:{

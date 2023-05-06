@@ -1,4 +1,3 @@
-import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
@@ -115,18 +114,32 @@ const Menu = ({ route }: any) => {
         </View>
 
         <View style={[styles.placarBox, styles.shadowProp]}>
-          <View>
-            <Text style={styles.placarBoxItem}>Pontuação</Text>
-            <Text style={styles.placarBoxItem}>Hábitos</Text>
-            <Text style={styles.placarBoxItem}>Bônus</Text>
-          </View>
-          <View>
-            <Text style={styles.placarBoxItem}>
-              {pontuacao} <AntDesign name="Trophy" size={20} color="black" />
-            </Text>
-            <Text style={styles.placarBoxItem}>{habitos.length}</Text>
+            <View style={styles.pontuacaoContainer}>
+              <Text style={styles.placarBoxItem}>Pontuação</Text>
+              <Text style={styles.placarBoxItem}>
+                {pontuacao}
+              </Text>
+              <Image
+                style={styles.iconCoin}
+                source={require("../../../assets/moeda.png")}
+              />
+            </View>
+            <View style={styles.pontuacaoContainer}>
+              <Text style={styles.placarBoxItem}>Hábitos    </Text>
+              <Text style={styles.placarBoxItem}>{habitos.length}</Text>
+              <Image
+                style={styles.iconCoin}
+                source={require("../../../assets/diamante.png")}
+              />
+            </View>
+            <View style={styles.pontuacaoContainer}>
+            <Text style={styles.placarBoxItem}>Bônus        </Text>
             <Text style={styles.placarBoxItem}>x1</Text>
-          </View>
+              <Image
+                style={styles.iconCoin}
+                source={require("../../../assets/raio.png")}
+              />
+            </View>
         </View>
 
         <View style={styles.contentBox}>

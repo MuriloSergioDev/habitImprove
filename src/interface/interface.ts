@@ -65,3 +65,11 @@ export interface CommentsInterface {
     nomeUsuario ?: string,
     dataCriacao ?:  Date | any ,
 }
+
+export interface RewardsInterface {
+    id ?: string,
+    idUsuario ?: string,
+    nome ?: string,
+    preco ?: string,
+    resgatado ?: boolean,
+}

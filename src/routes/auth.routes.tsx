@@ -11,7 +11,9 @@ import React from "react";
 import TabCreate from "../components/TabCreate";
 import ChatRede from "../pages/ChatRede";
 import CreateHabit from "../pages/CreateHabit";
+import CreateReward from "../pages/CreateReward";
 import Menu from "../pages/Menu";
+import Recompensa from "../pages/Recompensa";
 import Rede from "../pages/Rede";
 
 const AuthRoutes = () => {
@@ -19,6 +21,7 @@ const AuthRoutes = () => {
   const MenuStack = createStackNavigator();
   const CreateHabitStack = createStackNavigator();
   const RedeHabitStack = createStackNavigator();
+  const RewardStack = createStackNavigator();
 
   function MenuStackScreen() {
     return (
@@ -67,6 +70,27 @@ const AuthRoutes = () => {
     );
   }
 
+  function RewardStackScreen() {
+    return (
+      <RewardStack.Navigator
+        screenOptions={{ headerShown: false }}
+        initialRouteName="Recompensa"
+      >
+        <RewardStack.Screen
+          name="Recompensa"
+          component={Recompensa}
+          initialParams={{ id: undefined }}
+        />
+
+        <RewardStack.Screen
+          name="CreateReward"
+          component={CreateReward}
+          initialParams={{ id: undefined }}
+        />
+      </RewardStack.Navigator>
+    );
+  }
+
   const color = "#c3c7c4";
   const colorSelected = "white";
   const size = 25;
@@ -95,7 +119,7 @@ const AuthRoutes = () => {
           options={{
             tabBarLabel: "",
             tabBarIcon: ({focused}) => (
-              <Entypo name="bar-graph" size={24} color={focused ? colorSelected : color} />
+              <FontAwesome5 name="calendar-check" size={24} color={focused ? colorSelected : color} />
             ),
           }}
         />
@@ -111,11 +135,11 @@ const AuthRoutes = () => {
         />
         <Tab.Screen
           name="Settings 4"
-          component={CreateHabitStackScreen}
+          component={RewardStackScreen}
           options={{
             tabBarLabel: "",
             tabBarIcon: ({focused}) => (
-              <FontAwesome5 name="calendar-check" size={24} color={focused ? colorSelected : color} />
+              <Entypo name="briefcase" size={24} color={focused ? colorSelected : color}/>
             ),
           }}
         />
