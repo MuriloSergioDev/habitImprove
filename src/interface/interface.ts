@@ -30,8 +30,7 @@ export interface UserInterface {
     name ?: string
     email ?: string
     password ?: string
-    turma ?: string
-    permission ?: number
+    pontuacao ?: number
 }
 
 export interface DesempenhoInterface {
@@ -70,6 +69,6 @@ export interface RewardsInterface {
     id ?: string,
     idUsuario ?: string,
     nome ?: string,
-    preco ?: string,
+    preco : string,
     resgatado ?: boolean,
 }

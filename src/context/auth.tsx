@@ -1,5 +1,5 @@
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import React, { createContext, useState } from "react";
 import { auth, db } from "../config/Firebase";
 import { UserInterface } from "../interface/interface";
@@ -24,17 +24,7 @@ export const AuthProvider = ({ children } : Props) => {
     try {
       const response = await signInWithEmailAndPassword(auth, user, password);
       if (response.user.uid && response.user.emailVerified) {
-        const docRef = doc(db, "users", response.user.uid);
-        const data = await getDoc(docRef);
-
-        // navigateToMenu(data.data())
-        if (data.exists()) {
-          console.log(data.data());
-          setUser(data.data());
-        } else {
-          // doc.data() will be undefined in this case
-          console.log("No such document!");
-        }
+        getUser(response.user.uid);
       } else {
         // setMessageAlert('Seu email ainda nao foi verificado')
         // setModalAlertVisible(true)
@@ -44,6 +34,25 @@ export const AuthProvider = ({ children } : Props) => {
     } catch (error) {
       alert(error);
     }
+  }
+
+  function getUser(uid: string) {
+    const usersCollection = collection(db, "users");
+    const unsubscribe = onSnapshot(
+      query(usersCollection, where("uid", "==", uid)),
+      (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const data = {
+            ...doc.data(),
+          };
+          setUser(data);
+        });
+      },
+      (error) => {
+        console.error("Error getting user: ", error);
+      }
+    );
+    return unsubscribe;
   }
 
   async function logOut() {

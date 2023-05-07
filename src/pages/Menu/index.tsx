@@ -22,7 +22,6 @@ const Menu = ({ route }: any) => {
   const { user, signed, logOut } = useContext(AuthContext);
   const [habitos, setHabitos] = useState<HabitoInterface[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [pontuacao, setPontuacao] = useState(0);
 
   function navigateBack() {
     navigation.goBack();
@@ -50,7 +49,7 @@ const Menu = ({ route }: any) => {
         const daysOfWeek = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
         const dayOfWeek = daysOfWeek[date.getDay()];
         const dayOfMonth = date.getDate();
-        calculaPontuacao(habitos);
+
         habitos = habitos.filter((habito)=>{
           if(habito.recorrencia == 'd'){
             return true;
@@ -73,15 +72,6 @@ const Menu = ({ route }: any) => {
       }
     );
     return unsubscribe;
-  }
-
-  function calculaPontuacao(habitos : HabitoInterface[]) {
-    let pontuacao = 0;
-    habitos.forEach((habito: HabitoInterface)=>{
-      pontuacao = pontuacao + (parseInt(habito.contador ?? 0) * parseInt(habito.diasSeguidos ?? 0));
-    })
-
-    setPontuacao(pontuacao);
   }
 
   useEffect(() => {
@@ -117,7 +107,7 @@ const Menu = ({ route }: any) => {
             <View style={styles.pontuacaoContainer}>
               <Text style={styles.placarBoxItem}>Pontuação</Text>
               <Text style={styles.placarBoxItem}>
-                {pontuacao}
+                {user?.pontuacao}
               </Text>
               <Image
                 style={styles.iconCoin}

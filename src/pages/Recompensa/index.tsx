@@ -2,7 +2,8 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 import RewardItem from "../../components/RewardItem";
 import { db } from "../../config/Firebase";
 import AuthContext from "../../context/auth";
@@ -83,13 +84,24 @@ const Recompensa = ({ route }: any) => {
 
       <View style={styles.navDown}>
         {/* @ts-ignore */}
-        <View>
-          <Text>Saldo</Text>
+        <View style={styles.containerSaldoFull}>
+          <View style={styles.containerSaldo}>
+            <Text style={styles.saldoText}>Saldo</Text>
+            <Text style={styles.containerSaldo}>{user?.pontuacao}</Text>
+          </View>
+          <Image
+              style={styles.iconCoin}
+              source={require("../../../assets/moeda.png")}
+          />
         </View>
         <ScrollView style={styles.scroll}>
-          {rewards.map((item) => (
+          {rewards.length > 0 ? rewards.map((item) => (
             <RewardItem key={item.id} reward={item} />
-          ))}
+          )) :
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size="large" />
+          </View>
+          }
           <View style={styles.endLine}></View>
         </ScrollView>
       </View>

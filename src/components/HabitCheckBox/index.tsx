@@ -13,7 +13,7 @@ import { Alert, Text, View } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { db } from "../../config/Firebase";
 import AuthContext from "../../context/auth";
-import { HabitoInterface } from "../../interface/interface";
+import { HabitoInterface, UserInterface } from "../../interface/interface";
 import styles from "./styles";
 
 type Props = {
@@ -228,6 +228,28 @@ const HabitCheckBox = ({ habito }: Props) => {
     }
   }
 
+  async function atualizaPontuacao() {
+    try {
+      const docRef = doc(db, "users", user?.uid ?? "");
+      let data = await getDoc(docRef).then((doc: any): UserInterface => {
+        return doc.data();
+      });
+      data.pontuacao = calculaPontuacao(habito);
+      await setDoc(docRef, data);
+    } catch (error) {
+      console.log("Erro ao atualizar pontuacao");
+      console.log(error);
+    }
+  }
+
+  function calculaPontuacao(habito : HabitoInterface) {
+    let pontuacao = user?.pontuacao;
+    if(pontuacao){
+      pontuacao = pontuacao + (1 + 0.25 * parseInt(habito.diasSeguidos ?? 0));
+    }
+    return pontuacao;
+  }
+
   async function handleCreateNewRealizacao() {
     try {
       const now = new Date();
@@ -247,6 +269,7 @@ const HabitCheckBox = ({ habito }: Props) => {
       }
 
       atualizaHabito();
+      atualizaPontuacao();
       setIsUpdatedToday(true);
       console.log("Realizacao criada com sucesso");
     } catch (error) {
