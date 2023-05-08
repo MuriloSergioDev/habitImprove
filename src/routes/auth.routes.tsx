@@ -12,6 +12,7 @@ import TabCreate from "../components/TabCreate";
 import ChatRede from "../pages/ChatRede";
 import CreateHabit from "../pages/CreateHabit";
 import CreateReward from "../pages/CreateReward";
+import Estatisticas from "../pages/Estatisticas";
 import Menu from "../pages/Menu";
 import Recompensa from "../pages/Recompensa";
 import Rede from "../pages/Rede";
@@ -22,6 +23,7 @@ const AuthRoutes = () => {
   const CreateHabitStack = createStackNavigator();
   const RedeHabitStack = createStackNavigator();
   const RewardStack = createStackNavigator();
+  const EstatisticaStack = createStackNavigator();
 
   function MenuStackScreen() {
     return (
@@ -91,6 +93,21 @@ const AuthRoutes = () => {
     );
   }
 
+  function EstatisticaStackScreen() {
+    return (
+      <EstatisticaStack.Navigator
+        screenOptions={{ headerShown: false }}
+        initialRouteName="Estatisticas"
+      >
+        <EstatisticaStack.Screen
+          name="Estatisticas"
+          component={Estatisticas}
+          initialParams={{ id: undefined }}
+        />
+      </EstatisticaStack.Navigator>
+    );
+  }
+
   const color = "#c3c7c4";
   const colorSelected = "white";
   const size = 25;
@@ -115,7 +132,7 @@ const AuthRoutes = () => {
         />
         <Tab.Screen
           name="Add"
-          component={CreateHabitStackScreen}
+          component={EstatisticaStackScreen}
           options={{
             tabBarLabel: "",
             tabBarIcon: ({focused}) => (

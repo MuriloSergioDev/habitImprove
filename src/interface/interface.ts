@@ -21,7 +21,7 @@ export interface HabitoInterface {
     dataUltimaRealizacao?: Date | any ,
     dataCriacao ?:  Date | any ,
     diasDaSemana?: Array<string>,
-    diaMes?: Date,
+    diaMes?: number,
     uid?: string
 }
 
@@ -71,4 +71,11 @@ export interface RewardsInterface {
     nome ?: string,
     preco : string,
     resgatado ?: boolean,
+}
+
+export interface RealizationsInterface {
+    id ?: string,
+    idUsuario ?: string,
+    idHabito ?: string,
+    data : Date | any ,
 }
