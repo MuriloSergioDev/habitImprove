@@ -134,4 +134,19 @@ export default StyleSheet.create({
     justifyContent: "center",
     height: 400,
   },
+  containerAproveitamento:{
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height * 0.2,
+    backgroundColor: '#FBF9F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  txtAproveitamento:{
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  txtAproveitamentoResult:{
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
 });

@@ -3,7 +3,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { db } from "../../config/Firebase";
 import AuthContext from "../../context/auth";
@@ -19,7 +19,8 @@ const Estatisticas = ({ route }: any) => {
   const { id } = route.params;
   const { user, signed, logOut } = useContext(AuthContext);
   const [habitos, setHabitos] = useState<HabitoInterface[]>([]);
-  const [realizations, setRealizations] = useState<RealizationsInterface[]>([]);
+  const [aproveitamento, setAproveitamento] = useState<number>(0);
+  const [msgAproveitamento, setMsgAproveitamento] = useState<string>("");
   const [markedDates, setMarkedDates] = useState({});
   const [habito, setHabito] = useState<HabitoInterface>({
     titulo: "",
@@ -103,30 +104,59 @@ const Estatisticas = ({ route }: any) => {
           realizations.push(formattedDate);
         });
         const dataCriacao = new Date(
-          habito.dataCriacao.seconds * 1000 + habito.dataCriacao.nanoseconds / 1000000
+          habito.dataCriacao.seconds * 1000 +
+            habito.dataCriacao.nanoseconds / 1000000
         );
         const endDate = new Date();
         let datasNaoRealizadas: any[] = [];
-        if(habito.recorrencia == 'd'){
-          datasNaoRealizadas = getOccurrencesBetween(dataCriacao.toISOString().slice(0, 10), endDate.toISOString().slice(0, 10), realizations);
-        }else if(habito.recorrencia == 's'){
-          const selectedDaysIndexes = getSelectedDaysOfWeek(habito.diasDaSemana ?? []);
-          datasNaoRealizadas = getOccurrencesBetween(dataCriacao.toISOString().slice(0, 10), endDate.toISOString().slice(0, 10), realizations, selectedDaysIndexes);
-        }else{
-          datasNaoRealizadas = getLastOccurrencesOfMonth(dataCriacao.toISOString().slice(0, 10), habito.diaMes ?? 1, realizations);
+        if (habito.recorrencia == "d") {
+          datasNaoRealizadas = getOccurrencesBetween(
+            dataCriacao.toISOString().slice(0, 10),
+            endDate.toISOString().slice(0, 10),
+            realizations
+          );
+        } else if (habito.recorrencia == "s") {
+          const selectedDaysIndexes = getSelectedDaysOfWeek(
+            habito.diasDaSemana ?? []
+          );
+          datasNaoRealizadas = getOccurrencesBetween(
+            dataCriacao.toISOString().slice(0, 10),
+            endDate.toISOString().slice(0, 10),
+            realizations,
+            selectedDaysIndexes
+          );
+        } else {
+          datasNaoRealizadas = getLastOccurrencesOfMonth(
+            dataCriacao.toISOString().slice(0, 10),
+            habito.diaMes ?? 1,
+            realizations
+          );
         }
 
         console.log(datasNaoRealizadas);
 
-
-
         const markedDates = {
           ...retornaDatasRealizadas(realizations),
-          ...retornaDatasNaoRealizadas(datasNaoRealizadas)
+          ...retornaDatasNaoRealizadas(datasNaoRealizadas),
         };
 
         const markedDatesObject = markedDates;
+        let aprv = parseFloat(
+          (
+            (realizations.length /
+              (realizations.length + datasNaoRealizadas.length)) *
+            100
+          ).toFixed(2)
+        );
 
+        setAproveitamento(aprv);
+        if (aprv >= 75) {
+          setMsgAproveitamento("Otimo");
+        } else if (aprv >= 50 && aprv < 75) {
+          setMsgAproveitamento("Bom");
+        } else {
+          setMsgAproveitamento("Precisa melhorar");
+        }
         setMarkedDates(markedDatesObject);
       },
       (error) => {
@@ -141,7 +171,15 @@ const Estatisticas = ({ route }: any) => {
 
     for (let i = 0; i < daysOfWeek.length; i++) {
       const dayOfWeek = daysOfWeek[i];
-      const index = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"].indexOf(dayOfWeek);
+      const index = [
+        "Domingo",
+        "Segunda",
+        "Terça",
+        "Quarta",
+        "Quinta",
+        "Sexta",
+        "Sábado",
+      ].indexOf(dayOfWeek);
       if (index !== -1) {
         selectedDaysOfWeek.push(index);
       }
@@ -150,7 +188,7 @@ const Estatisticas = ({ route }: any) => {
     return selectedDaysOfWeek;
   }
 
-  function retornaDatasRealizadas(datas : any[]) {
+  function retornaDatasRealizadas(datas: any[]) {
     const markedDatesObject = datas.reduce((acc, date) => {
       return {
         ...acc,
@@ -158,7 +196,7 @@ const Estatisticas = ({ route }: any) => {
           selected: true,
           marked: true,
           dotColor: "green",
-          selectedColor: 'green',
+          selectedColor: "green",
         },
       };
     }, {});
@@ -166,7 +204,7 @@ const Estatisticas = ({ route }: any) => {
     return markedDatesObject;
   }
 
-  function retornaDatasNaoRealizadas(datas : any[]) {
+  function retornaDatasNaoRealizadas(datas: any[]) {
     const markedDatesObject = datas.reduce((acc, date) => {
       return {
         ...acc,
@@ -174,7 +212,7 @@ const Estatisticas = ({ route }: any) => {
           selected: true,
           marked: true,
           dotColor: "red",
-          selectedColor: 'red',
+          selectedColor: "red",
         },
       };
     }, {});
@@ -182,16 +220,31 @@ const Estatisticas = ({ route }: any) => {
     return markedDatesObject;
   }
 
-  function getOccurrencesBetween(startDate: string, endDate: string, excludeDates: string[] = [], weekDays: number[] = [0, 1, 2, 3, 4, 5, 6]): string[] {
+  function getOccurrencesBetween(
+    startDate: string,
+    endDate: string,
+    excludeDates: string[] = [],
+    weekDays: number[] = [0, 1, 2, 3, 4, 5, 6]
+  ): string[] {
     const occurrences: string[] = [];
     let currentDate = new Date(startDate);
     currentDate.setDate(currentDate.getDate() + 1);
 
     while (currentDate <= new Date(endDate)) {
       const currentDayOfWeek = currentDate.getDay(); // 0 = domingo, 1 = segunda, ..., 6 = sábado
-      const currentDateFormatted = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')}`;
+      const currentDateFormatted = `${currentDate.getFullYear()}-${(
+        currentDate.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}-${currentDate
+        .getDate()
+        .toString()
+        .padStart(2, "0")}`;
 
-      if (weekDays.includes(currentDayOfWeek) && !excludeDates.includes(currentDateFormatted)) {
+      if (
+        weekDays.includes(currentDayOfWeek) &&
+        !excludeDates.includes(currentDateFormatted)
+      ) {
         occurrences.push(currentDateFormatted);
       }
 
@@ -201,8 +254,11 @@ const Estatisticas = ({ route }: any) => {
     return occurrences;
   }
 
-
-  function getLastOccurrencesOfMonth(startDate: string, dayOfMonth: number, excludeDates: string[] = []): string[] {
+  function getLastOccurrencesOfMonth(
+    startDate: string,
+    dayOfMonth: number,
+    excludeDates: string[] = []
+  ): string[] {
     const lastOccurrences: string[] = [];
     const currentDate = new Date();
     const start = new Date(startDate);
@@ -211,11 +267,19 @@ const Estatisticas = ({ route }: any) => {
     // retrocede do mês atual até o mês em que a data de início está
     while (currentDate >= start) {
       const currentMonth = currentDate.getMonth();
-      const lastDayOfMonth = new Date(currentDate.getFullYear(), currentMonth + 1, 0).getDate();
+      const lastDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentMonth + 1,
+        0
+      ).getDate();
 
       // verifica se o dia do mês desejado está dentro do mês atual
       if (dayOfMonth <= lastDayOfMonth) {
-        const occurrenceDate = new Date(currentDate.getFullYear(), currentMonth, dayOfMonth);
+        const occurrenceDate = new Date(
+          currentDate.getFullYear(),
+          currentMonth,
+          dayOfMonth
+        );
         const occurrenceDateString = formatDate(occurrenceDate);
 
         // adiciona a data se não estiver na lista de exclusões
@@ -233,8 +297,8 @@ const Estatisticas = ({ route }: any) => {
 
   function formatDate(date: Date): string {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
 
@@ -255,6 +319,22 @@ const Estatisticas = ({ route }: any) => {
       };
     }
   }, [habito]);
+
+  const stylesIntern = StyleSheet.create({
+    green: {
+      color: "#1D6A02",
+    },
+    blue: {
+      color: "rgb(4, 108, 188)",
+    },
+    red: {
+      color: "rgb(188, 4, 4)",
+    },
+    text: {
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+  });
 
   return (
     <View style={styles.container}>
@@ -298,12 +378,28 @@ const Estatisticas = ({ route }: any) => {
           </View>
         </View>
         <ScrollView style={styles.scroll}>
-        <Calendar
-          style={styles.calendario}
-          onDayPress={handleDayPress}
-          markedDates={markedDates}
-        />
-
+          <Calendar
+            style={styles.calendario}
+            onDayPress={handleDayPress}
+            markedDates={markedDates}
+          />
+          <View style={[styles.containerAproveitamento, styles.shadowProp]}>
+            <Text style={styles.txtAproveitamento}>Aproveitamento</Text>
+            <Text
+              style={
+                aproveitamento >= 75
+                  ? [stylesIntern.text, stylesIntern.blue]
+                  : aproveitamento >= 50 && aproveitamento < 75
+                  ? [stylesIntern.text, stylesIntern.green]
+                  : [stylesIntern.text, stylesIntern.red]
+              }
+            >
+              {aproveitamento}%
+            </Text>
+            <Text style={styles.txtAproveitamentoResult}>
+              {msgAproveitamento}
+            </Text>
+          </View>
           <View style={styles.endLine}></View>
         </ScrollView>
       </View>
