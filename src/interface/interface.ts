@@ -22,6 +22,7 @@ export interface HabitoInterface {
     dataCriacao ?:  Date | any ,
     diasDaSemana?: Array<string>,
     diaMes?: number,
+    metas ?:Array<string>,
     uid?: string
 }
 

@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import {
   addDoc,
   collection,
@@ -10,6 +11,7 @@ import {
 } from "firebase/firestore";
 import React, { useContext, useEffect } from "react";
 import { Alert, Text, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { Checkbox } from "react-native-paper";
 import { db } from "../../config/Firebase";
 import AuthContext from "../../context/auth";
@@ -21,6 +23,7 @@ type Props = {
 };
 
 const HabitCheckBox = ({ habito }: Props) => {
+  const navigation = useNavigation<any>();
   const { user, signed, logOut } = useContext(AuthContext);
   const [checked, setChecked] = React.useState(false);
   const [isUpdatedToday, setIsUpdatedToday] = React.useState(false);
@@ -202,6 +205,7 @@ const HabitCheckBox = ({ habito }: Props) => {
         !isUpdatedYesterday &&
         !isUpdatedYesterday
       ) {
+        verificaQuebraMetas(parseInt(data.diasSeguidos));
         data.diasSeguidos = "0";
       } else if (
         data.recorrencia == "s" &&
@@ -209,6 +213,7 @@ const HabitCheckBox = ({ habito }: Props) => {
         (data.dataUltimaRealizacao < startOfOcorrencia ||
           data.dataUltimaRealizacao > endOfOcorrencia)
       ) {
+        verificaQuebraMetas(parseInt(data.diasSeguidos));
         data.diasSeguidos = "0";
       } else if (
         data.recorrencia == "m" &&
@@ -216,9 +221,11 @@ const HabitCheckBox = ({ habito }: Props) => {
         (data.dataUltimaRealizacao < startOfDataMesPassado ||
           data.dataUltimaRealizacao > endOfDataMesPassado)
       ) {
+        verificaQuebraMetas(parseInt(data.diasSeguidos));
         data.diasSeguidos = "0";
       } else {
         data.diasSeguidos = (parseInt(data.diasSeguidos) + 1).toString();
+        verificaMetas(parseInt(data.diasSeguidos));
       }
       data.dataUltimaRealizacao = new Date();
       await setDoc(docRef, data);
@@ -250,6 +257,35 @@ const HabitCheckBox = ({ habito }: Props) => {
     return pontuacao;
   }
 
+  function verificaMetas(diasSeguidos : number) {
+    if(habito.metas?.includes(diasSeguidos.toString())){
+        handleCreateNewNews('p', `${user?.name} completou ${diasSeguidos} realizações: ${habito.titulo}`);
+    }
+    // if(habito.recorrencia == 'd'){
+
+    //   if(diasSeguidos == 7 || diasSeguidos == 30 || diasSeguidos == 60 || diasSeguidos == 90 || diasSeguidos == 120){
+    //     handleCreateNewNews('p', `${user?.name} completou ${diasSeguidos} realizações: ${habito.titulo}`);
+    //   }
+
+    // } else if(habito.recorrencia == 's'){
+
+    //   if(diasSeguidos == 10 || diasSeguidos == 20 || diasSeguidos == 40 || diasSeguidos == 60 || diasSeguidos == 80){
+    //     handleCreateNewNews('p', `${user?.name} completou ${diasSeguidos} realizações: ${habito.titulo}`);
+    //   }
+
+    // }else{
+    //   if(diasSeguidos == 1 || diasSeguidos == 4 || diasSeguidos == 7 || diasSeguidos == 10 || diasSeguidos == 12){
+    //     handleCreateNewNews('p', `${user?.name} completou ${diasSeguidos} realizações: ${habito.titulo}`);
+    //   }
+    // }
+  }
+
+  function verificaQuebraMetas(diasSeguidos : number) {
+    if(diasSeguidos > 7){
+      handleCreateNewNews('n', `${user?.name} encerrou ${diasSeguidos} realizações: ${habito.titulo}`);
+    }
+  }
+
   async function handleCreateNewRealizacao() {
     try {
       const now = new Date();
@@ -279,8 +315,38 @@ const HabitCheckBox = ({ habito }: Props) => {
     }
   }
 
+  async function handleCreateNewNews(tipo : string, descricao: string) {
+    try {
+      const now = new Date();
+      const data = {
+        data: now,
+        idHabito: habito.id,
+        idUsuario: user?.uid ?? "",
+        comentarios: 0,
+        reacoes: 0,
+        tipo: tipo,
+        descricao : descricao
+      };
+
+      const dbRef = collection(db, "news");
+      await addDoc(dbRef, data);
+
+      console.log("News criada com sucesso");
+    } catch (error) {
+      console.log("Erro ao criar news");
+      console.log(error);
+      //alert(error)
+    }
+  }
+
   return (
     <View style={[styles.container, styles.shadowProp]}>
+      <TouchableOpacity onPress={() => {
+        navigation.navigate('Goals', {
+            habito: habito
+        });
+
+      }}>
       <View style={styles.boxText}>
         <Text style={styles.text}>{habito.titulo}</Text>
         <View style={styles.boxTextItem}>
@@ -288,6 +354,7 @@ const HabitCheckBox = ({ habito }: Props) => {
           <Text style={styles.textTime}>Sequência: {habito.diasSeguidos}</Text>
         </View>
       </View>
+      </TouchableOpacity>
       <Checkbox
         status={checked || isUpdatedToday ? "checked" : "unchecked"}
         onPress={() => {

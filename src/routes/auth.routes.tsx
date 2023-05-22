@@ -13,6 +13,7 @@ import ChatRede from "../pages/ChatRede";
 import CreateHabit from "../pages/CreateHabit";
 import CreateReward from "../pages/CreateReward";
 import Estatisticas from "../pages/Estatisticas";
+import Goals from "../pages/Goals";
 import Menu from "../pages/Menu";
 import Recompensa from "../pages/Recompensa";
 import Rede from "../pages/Rede";
@@ -32,6 +33,11 @@ const AuthRoutes = () => {
         initialRouteName="Menu"
       >
         <MenuStack.Screen name="Menu" component={Menu} />
+        <MenuStack.Screen
+          name="Goals"
+          component={Goals}
+          initialParams={{ habito: undefined }}
+        />
       </MenuStack.Navigator>
     );
   }
