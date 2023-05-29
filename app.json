@@ -4,7 +4,7 @@
     "slug": "novo-tcc",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logoApp.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",

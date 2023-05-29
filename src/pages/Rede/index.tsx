@@ -39,6 +39,18 @@ const Rede = ({ route }: any) => {
           news.push(data);
         });
 
+        news.sort((a, b) => {
+          const dateA = new Date(
+            a.dataCriacao * 1000 +
+            a.dataCriacao.nanoseconds / 1000000
+          );
+          const dateB = new Date(
+            b.dataCriacao * 1000 +
+            b.dataCriacao.nanoseconds / 1000000
+          );
+          return dateB.getTime() - dateA.getTime();
+        });
+
         setNews(news);
       },
       (error) => {

@@ -250,8 +250,9 @@ const HabitCheckBox = ({ habito }: Props) => {
   }
 
   function calculaPontuacao(habito : HabitoInterface) {
-    let pontuacao = user?.pontuacao;
-    if(pontuacao){
+    let pontuacao = 0;
+    if(user){
+      pontuacao = user.pontuacao;
       pontuacao = pontuacao + (1 + 0.25 * parseInt(habito.diasSeguidos ?? 0));
     }
     return pontuacao;
@@ -319,7 +320,7 @@ const HabitCheckBox = ({ habito }: Props) => {
     try {
       const now = new Date();
       const data = {
-        data: now,
+        dataCriacao: now,
         idHabito: habito.id,
         idUsuario: user?.uid ?? "",
         comentarios: 0,

@@ -1,6 +1,5 @@
-import { StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
-import { Dimensions } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   container: {
@@ -11,9 +10,9 @@ export default StyleSheet.create({
   },
   logo: {
     height: Dimensions.get('window').height * 0.15,
-    width: Dimensions.get('window').width * 0.3,
+    width: Dimensions.get('window').width * 0.6,
     resizeMode: "contain",
-    marginBottom: 60
+    marginBottom: 40
   },
   input: {
     padding: 5,

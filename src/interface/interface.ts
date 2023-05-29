@@ -31,7 +31,7 @@ export interface UserInterface {
     name ?: string
     email ?: string
     password ?: string
-    pontuacao ?: number
+    pontuacao : number
 }
 
 export interface DesempenhoInterface {
@@ -55,6 +55,7 @@ export interface NewsInterface {
     descricao ?: string,
     comentarios : number,
     tipo ?: string,
+    dataCriacao ?:  Date | any ,
 }
 
 export interface CommentsInterface {

@@ -44,6 +44,7 @@ const SignUp = ({ }: Props) => {
                         name: user.name,
                         email: user.email,
                         password: user.password,
+                        pontuacao: 0,
                     }
 
                     const docRef = doc(db, "users", response.user.uid);

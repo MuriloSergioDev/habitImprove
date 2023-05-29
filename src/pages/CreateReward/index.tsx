@@ -1,14 +1,15 @@
 import { AntDesign, Feather, Foundation } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
-import { addDoc, collection } from "firebase/firestore";
-import React, { useContext, useState } from "react";
+import { addDoc, collection, onSnapshot } from "firebase/firestore";
+import React, { useContext, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { TextInput } from "react-native-paper";
 import AlertModal from "../../components/AlertModal";
 import Button from "../../components/Button";
 import { db } from '../../config/Firebase';
 import AuthContext from "../../context/auth";
-import { RewardsInterface } from "../../interface/interface";
+import { RewardsInterface, UserInterface } from "../../interface/interface";
 import styles from "./styles";
 
 
@@ -19,6 +20,7 @@ const CreateReward = ({route}: any) => {
   const { user, signed, logOut } = useContext(AuthContext);
   const [messageAlert, setMessageAlert] = useState("");
   const [modalAlertVisible, setModalAlertVisible] = useState(false);
+  const [users, setUsers] = useState<UserInterface[]>([]);
   const [reward, setReward] = useState<RewardsInterface>({
     nome: "",
     idUsuario: user?.uid,
@@ -34,6 +36,45 @@ const CreateReward = ({route}: any) => {
   function navigateToRecompensa() {
     navigation.navigate("Recompensa");
   }
+
+  function getUsers() {
+    const usersCollection = collection(db, "users");
+    const unsubscribe = onSnapshot(
+      usersCollection,
+      (querySnapshot) => {
+        let users: any[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = {
+            uid: doc.id,
+            name: doc.get('name')
+          };
+
+          users.push(data);
+        });
+
+        users = users.filter((u)=>{
+          if(u.uid != user?.uid){
+            return true;
+          }
+
+          return false;
+        })
+        setUsers(users);
+      },
+      (error) => {
+        console.error("Error getting habits: ", error);
+      }
+    );
+    return unsubscribe;
+  }
+
+  useEffect(() => {
+    const cancelarEscuta = getUsers();
+
+    return () => {
+      cancelarEscuta();
+    };
+  }, []);
 
   async function handleCreateNewReward() {
     try {
@@ -129,6 +170,23 @@ const CreateReward = ({route}: any) => {
           />
           </View>
         </View>
+        <View style={styles.boxRep}>
+            <Text>Usuario:</Text>
+            <Picker
+              selectedValue={reward.idUsuario}
+              style={{ height: 50, width: 200 }}
+              onValueChange={(itemValue, itemIndex) =>
+                setReward((prevState) => {
+                  return { ...prevState, idUsuario: itemValue };
+                })
+              }
+            >
+              <Picker.Item key={user?.uid} label="Para mim" value={user?.uid} />
+              {users.map((usu)=> (
+                <Picker.Item key={usu.uid} label={usu.name} value={usu.uid} />
+                ))}
+            </Picker>
+          </View>
         <Button
           color="#FE9D2A"
           underlayColor="#e69026"

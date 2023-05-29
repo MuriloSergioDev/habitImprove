@@ -102,6 +102,7 @@ export default StyleSheet.create({
     },
     scroll: {
         width: Dimensions.get('window').width,
+        maxHeight: 600,
     },
     boxRow:{
         marginVertical: 10

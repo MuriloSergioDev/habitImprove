@@ -28,7 +28,7 @@ const Login = ({}: Props) => {
   }
 
   function navigateToRecoverPassword() {
-    navigation.navigate("Profile");
+    navigation.navigate("RecoverPassword");
   }
 
   async function handleLogin() {

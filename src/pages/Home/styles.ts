@@ -1,6 +1,5 @@
-import { StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
-import { Dimensions } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
     container: {
@@ -32,5 +31,5 @@ export default StyleSheet.create({
         resizeMode: "contain",
         marginBottom: 50
     }
-    
+
 });

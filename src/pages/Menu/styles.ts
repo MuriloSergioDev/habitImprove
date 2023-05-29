@@ -50,6 +50,7 @@ export default StyleSheet.create({
         resizeMode: "contain",
     },
     pontuacaoContainer: {
+        padding: 5,
         width: 220,
         flexDirection: 'row',
         alignItems: 'center',

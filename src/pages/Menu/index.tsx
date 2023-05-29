@@ -119,7 +119,7 @@ const Menu = ({ route }: any) => {
               <Text style={styles.placarBoxItem}>{habitos.length}</Text>
               <Image
                 style={styles.iconCoin}
-                source={require("../../../assets/diamante.png")}
+                source={require("../../../assets/list2.png")}
               />
             </View>
             <View style={styles.pontuacaoContainer}>
@@ -127,7 +127,7 @@ const Menu = ({ route }: any) => {
             <Text style={styles.placarBoxItem}>x1</Text>
               <Image
                 style={styles.iconCoin}
-                source={require("../../../assets/raio.png")}
+                source={require("../../../assets/bonus.png")}
               />
             </View>
         </View>
