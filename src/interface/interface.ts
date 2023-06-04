@@ -72,7 +72,10 @@ export interface RewardsInterface {
     idUsuario ?: string,
     nome ?: string,
     preco : string,
+    prazo ?: string,
+    surpresa ?: boolean,
     resgatado ?: boolean,
+    dataCriacao ?:  Date | any ,
 }
 
 export interface RealizationsInterface {

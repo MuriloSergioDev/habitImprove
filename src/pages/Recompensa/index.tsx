@@ -16,6 +16,7 @@ const Recompensa = ({ route }: any) => {
   const { id } = route.params;
   const { user, signed, logOut } = useContext(AuthContext);
   const [rewards, setRewards] = useState<RewardsInterface[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   function navigateBack() {
     navigation.goBack();
@@ -27,6 +28,7 @@ const Recompensa = ({ route }: any) => {
 
   function getRewards() {
     const rewardsCollection = collection(db, "rewards");
+    setIsLoading(true);
     const unsubscribe = onSnapshot(
       query(rewardsCollection, where("idUsuario", "==", user?.uid)),
       (querySnapshot) => {
@@ -36,12 +38,33 @@ const Recompensa = ({ route }: any) => {
             id: doc.id,
             ...doc.data(),
           };
+          let prazoEncerrado = false;
+          if(data.prazo != 0 ){
+            const hoje = new Date();
+            const dataCriacao =  new Date(
+              data.dataCriacao.seconds * 1000 +
+              data.dataCriacao.nanoseconds / 1000000
+            );
 
-          rewards.push(data);
+            let dataCriacaoComPrazoAdd = new Date(
+              data.dataCriacao.seconds * 1000 +
+              data.dataCriacao.nanoseconds / 1000000
+            );
+
+            dataCriacaoComPrazoAdd.setDate(dataCriacaoComPrazoAdd.getDate() + parseInt(data.prazo));
+            if (hoje.getTime() >= dataCriacaoComPrazoAdd.getTime()) {
+              prazoEncerrado = true;
+            }
+          }
+
+          if(!prazoEncerrado){
+            rewards.push(data);
+          }
         });
 
         rewards.sort((a, b) => a.preco - b.preco);
         setRewards(rewards);
+        setIsLoading(false); // Set isLoading to false after loading the
       },
       (error) => {
         console.error("Error getting rewards: ", error);
@@ -95,13 +118,16 @@ const Recompensa = ({ route }: any) => {
           />
         </View>
         <ScrollView style={styles.scroll}>
-          {rewards.length > 0 ? rewards.map((item) => (
-            <RewardItem key={item.id} reward={item} />
-          )) :
+          {isLoading ?
           <View style={styles.spinnerContainer}>
             <ActivityIndicator size="large" />
           </View>
-          }
+          :
+          (rewards.length > 0 ? rewards.map((item) => (
+            <RewardItem key={item.id} reward={item} />
+          )) :
+            <Text style={styles.noContent}>Nenhuma recompensa cadastrada</Text>
+          )}
           <View style={styles.endLine}></View>
         </ScrollView>
       </View>

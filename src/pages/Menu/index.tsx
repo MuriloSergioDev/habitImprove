@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { ActivityIndicator } from "react-native-paper";
 import HabitCheckBox from "../../components/HabitCheckBox";
 import LogoutModal from "../../components/LogoutModal";
 import { db } from "../../config/Firebase";
@@ -22,6 +23,7 @@ const Menu = ({ route }: any) => {
   const { user, signed, logOut } = useContext(AuthContext);
   const [habitos, setHabitos] = useState<HabitoInterface[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   function navigateBack() {
     navigation.goBack();
@@ -33,6 +35,7 @@ const Menu = ({ route }: any) => {
 
   function getHabits() {
     const habitsCollection = collection(db, "habits");
+    setIsLoading(true);
     const unsubscribe = onSnapshot(
       query(habitsCollection, where("uid", "==", user?.uid)),
       (querySnapshot) => {
@@ -66,6 +69,7 @@ const Menu = ({ route }: any) => {
           return false;
         })
         setHabitos(habitos);
+        setIsLoading(false);
       },
       (error) => {
         console.error("Error getting habits: ", error);
@@ -135,12 +139,22 @@ const Menu = ({ route }: any) => {
         <View style={styles.contentBox}>
           <Text style={styles.contentBoxText}>Atividades próximas</Text>
           <ScrollView style={styles.scroll}>
-            {habitos.map((habito) => (
+            {
+            isLoading ?
+            <View style={styles.spinnerContainer}>
+              <ActivityIndicator size="large" />
+            </View>
+            :
+            (habitos.length > 0 ?
+            habitos.map((habito) => (
               <HabitCheckBox
                 key={habito.id}
                 habito={habito}
               />
-            ))}
+            ))
+          :
+          <Text style={styles.noContent}>Nenhuma recompensa cadastrada</Text>
+          )}
             <View style={styles.endLine}></View>
           </ScrollView>
         </View>

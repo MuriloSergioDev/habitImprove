@@ -28,5 +28,5 @@ export default StyleSheet.create({
     },
     price: {
         fontWeight: 'bold'
-    }
+    },
 });

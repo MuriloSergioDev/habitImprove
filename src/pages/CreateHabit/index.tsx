@@ -183,7 +183,7 @@ const CreateHabit = ({route}: any) => {
           }}
           style={styles.input}
           mode="outlined"
-          placeholder="Titulo"
+          placeholder="Título"
           value={habito.titulo}
           onChangeText={(value) =>
             setHabito((prevState) => {

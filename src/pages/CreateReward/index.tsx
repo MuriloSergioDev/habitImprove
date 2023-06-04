@@ -3,7 +3,8 @@ import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
 import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
+import { Tooltip } from "react-native-elements";
 import { TextInput } from "react-native-paper";
 import AlertModal from "../../components/AlertModal";
 import Button from "../../components/Button";
@@ -25,6 +26,8 @@ const CreateReward = ({route}: any) => {
     nome: "",
     idUsuario: user?.uid,
     preco : '0',
+    prazo : '0',
+    surpresa : false,
     resgatado : false,
   });
 
@@ -80,6 +83,7 @@ const CreateReward = ({route}: any) => {
     try {
       if (reward.nome) {
         const dbRef = collection(db, "rewards");
+        reward.dataCriacao = new Date();
         addDoc(dbRef, reward)
 
         setMessageAlert("Recompensa criada com sucesso");
@@ -94,6 +98,26 @@ const CreateReward = ({route}: any) => {
       console.log(error);
       //alert(error)
     }
+  }
+
+  function checkOnlyNumbers(value: string) {
+    let newText = '';
+    let numbers = '0123456789';
+
+    for (var i=0; i < value.length; i++) {
+        if(numbers.indexOf(value[i]) > -1 ) {
+            newText = newText + value[i];
+        }
+        else {
+            Alert.alert(
+              "Atenção",
+              "Apenas números permitidos",
+              [{ text: "Ok", onPress: () => {} }],
+              { cancelable: true }
+            )
+        }
+    }
+    return newText;
   }
 
   let modalIcon =
@@ -147,7 +171,7 @@ const CreateReward = ({route}: any) => {
           }}
           style={styles.input}
           mode="outlined"
-          placeholder="Titulo"
+          placeholder="Título"
           value={reward.nome}
           onChangeText={(value) =>
             setReward((prevState) => {
@@ -156,19 +180,21 @@ const CreateReward = ({route}: any) => {
           }
         />
         <View style={styles.boxRow}>
+
         <View style={styles.boxRep}>
-            <Text>Custo:</Text>
+            <Text>Custo (moedas):</Text>
             <TextInput
             keyboardType='numeric'
             onChangeText={(value) =>
               setReward((prevState) => {
-                return { ...prevState, preco: value };
+                let newText = checkOnlyNumbers(value);
+                return { ...prevState, preco: newText };
               })
             }
             value={reward.preco}
             maxLength={10}  //setting limit of input
           />
-          </View>
+        </View>
         </View>
         <View style={styles.boxRep}>
             <Text>Usuario:</Text>
@@ -186,7 +212,56 @@ const CreateReward = ({route}: any) => {
                 <Picker.Item key={usu.uid} label={usu.name} value={usu.uid} />
                 ))}
             </Picker>
+        </View>
+
+        {reward.idUsuario != user?.uid  ? (
+        <View style={styles.boxRow}>
+        <View style={styles.boxRep}>
+            <Text>Prazo (dias):
+            <Tooltip popover={<Text>Selecione um prazo em dias, 0 correponde a sem limite de prazo</Text>} width={300} height={60}>
+              <Foundation name="info" size={24} color="black" />
+            </Tooltip>
+
+            </Text>
+            <TextInput
+            keyboardType='numeric'
+            onChangeText={(value) =>
+              setReward((prevState) => {
+                let newText = checkOnlyNumbers(value);
+                return { ...prevState, prazo: newText };
+              })
+            }
+            value={reward.prazo}
+            maxLength={3}  //setting limit of input
+          />
           </View>
+        </View>
+          ) : null
+        }
+
+        {reward.idUsuario != user?.uid ? (
+        <View style={styles.boxRep}>
+            <Text>Surpresa:
+            <Tooltip popover={<Text>Selecione se a recompensa irá ter seu título aparecendo ou apenas no momento do resgate</Text>} width={300} height={80}>
+              <Foundation name="info" size={24} color="black" />
+            </Tooltip>
+            </Text>
+            <Picker
+              selectedValue={reward.surpresa}
+              style={{ height: 50, width: 200 }}
+              onValueChange={(itemValue, itemIndex) =>
+                setReward((prevState) => {
+                  return { ...prevState, surpresa: itemValue };
+                })
+              }
+            >
+              <Picker.Item label="Não" value={false} />
+              <Picker.Item label="Sim" value={true}/>
+            </Picker>
+        </View>
+          ) : null
+        }
+
         <Button
           color="#FE9D2A"
           underlayColor="#e69026"

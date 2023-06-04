@@ -131,4 +131,7 @@ export default StyleSheet.create({
     justifyContent: "center",
     height: 400,
   },
+  noContent:{
+    textAlign: 'center',
+  },
 });

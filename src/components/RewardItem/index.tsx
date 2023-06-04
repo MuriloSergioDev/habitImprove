@@ -1,6 +1,6 @@
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useContext } from "react";
-import { Alert, Image, Text, View } from "react-native";
+import { Alert, Image, StyleSheet, Text, View } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { db } from "../../config/Firebase";
 import AuthContext from "../../context/auth";
@@ -32,21 +32,24 @@ const RewardItem = ({ reward }: Props) => {
         const dbRef = collection(db, "rewards");
         const meuDocumentoRef = doc(dbRef, reward.id);
         reward.resgatado = true;
-        const data = {
-          idUsuario: reward.idUsuario,
-          nome: reward.nome,
-          preco: reward?.preco,
-          resgatado: true,
-        };
-        await setDoc(meuDocumentoRef, data);
+        await setDoc(meuDocumentoRef, reward);
         atualizaPontuacao();
         setChecked(true);
-        Alert.alert(
-          "Sucesso",
-          "Recompensa resgatada com sucesso",
-          [{ text: "Ok", onPress: () => {} }],
-          { cancelable: true }
-        );
+        if (reward.surpresa) {
+          Alert.alert(
+            "Sucesso",
+            `Recompensa resgatada com sucesso, sua recompensa é "${reward.nome}"`,
+            [{ text: "Ok", onPress: () => {} }],
+            { cancelable: true }
+          );
+        }else{
+          Alert.alert(
+            "Sucesso",
+            "Recompensa resgatada com sucesso",
+            [{ text: "Ok", onPress: () => {} }],
+            { cancelable: true }
+          );
+        }
         console.log("Premio resgatado com sucesso");
       }
     } catch (error) {
@@ -78,6 +81,20 @@ const RewardItem = ({ reward }: Props) => {
     return pontuacao;
   }
 
+  const stylesIntern = StyleSheet.create({
+    gold: {
+      color: "#e4ab00",
+    },
+    black: {
+      color: "black",
+    },
+    text: {
+      width: 200,
+      fontSize: 16,
+      marginLeft: 20
+    },
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.containerText}>
@@ -87,7 +104,14 @@ const RewardItem = ({ reward }: Props) => {
         />
         <Text style={styles.price}>{reward.preco}</Text>
       </View>
-      <Text style={styles.title}>{reward.nome}</Text>
+      <View>
+      <Text style={
+                reward.surpresa
+                ? [stylesIntern.text, stylesIntern.gold]
+                : [stylesIntern.text, stylesIntern.black]
+              }>{reward.surpresa && reward.resgatado == false ? '🎁 Surpresa 🎁' : reward.nome}</Text>
+      <Text style={stylesIntern.text}><Text style={styles.price}>Prazo:</Text> {reward.prazo != '0' && reward.prazo != null ? `${reward.prazo} dias` : 'Ilimitado'}</Text>
+      </View>
       <Checkbox
         status={checked || reward.resgatado ? "checked" : "unchecked"}
         onPress={() => {

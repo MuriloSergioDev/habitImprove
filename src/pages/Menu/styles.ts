@@ -130,5 +130,14 @@ export default StyleSheet.create({
     },
     endLine:{
         height: 10,
-    }
+    },
+    spinnerContainer: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        height: 400,
+    },
+    noContent:{
+        textAlign: 'center',
+    },
 });
