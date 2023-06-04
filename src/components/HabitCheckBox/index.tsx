@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 import {
   addDoc,
   collection,
@@ -104,7 +104,11 @@ const HabitCheckBox = ({ habito }: Props) => {
 
   function getLastDayOfWeek(dayOfWeek: number) {
     const today = new Date();
-    let lastDayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    let lastDayDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
     let diff = lastDayDate.getDay() - dayOfWeek;
     if (diff < 0) diff += 7;
     lastDayDate.setDate(lastDayDate.getDate() - diff);
@@ -193,7 +197,7 @@ const HabitCheckBox = ({ habito }: Props) => {
         59
       );
 
-      if(data.dataUltimaRealizacao != null){
+      if (data.dataUltimaRealizacao != null) {
         data.dataUltimaRealizacao = new Date(
           data.dataUltimaRealizacao.seconds * 1000 +
             data.dataUltimaRealizacao.nanoseconds / 1000000
@@ -235,13 +239,14 @@ const HabitCheckBox = ({ habito }: Props) => {
     }
   }
 
-  async function atualizaPontuacao() {
+  async function atualizaPontuacaoAndBonus() {
     try {
       const docRef = doc(db, "users", user?.uid ?? "");
       let data = await getDoc(docRef).then((doc: any): UserInterface => {
         return doc.data();
       });
       data.pontuacao = calculaPontuacao(habito);
+      data.bonus = calculaBonus();
       await setDoc(docRef, data);
     } catch (error) {
       console.log("Erro ao atualizar pontuacao");
@@ -249,18 +254,21 @@ const HabitCheckBox = ({ habito }: Props) => {
     }
   }
 
-  function calculaPontuacao(habito : HabitoInterface) {
+  function calculaPontuacao(habito: HabitoInterface) {
     let pontuacao = 0;
-    if(user){
+    if (user) {
       pontuacao = user.pontuacao;
-      pontuacao = pontuacao + (1 + 0.25 * parseInt(habito.diasSeguidos ?? 0));
+      pontuacao = pontuacao + (1 + 0.25 * parseInt(habito.diasSeguidos ?? 0)) * user.bonus;
     }
     return pontuacao;
   }
 
-  function verificaMetas(diasSeguidos : number) {
-    if(habito.metas?.includes(diasSeguidos.toString())){
-        handleCreateNewNews('p', `${user?.name} completou ${diasSeguidos} realizações: ${habito.titulo}`);
+  function verificaMetas(diasSeguidos: number) {
+    if (habito.metas?.includes(diasSeguidos.toString())) {
+      handleCreateNewNews(
+        "p",
+        `${user?.name} completou ${diasSeguidos} realizações: ${habito.titulo}`
+      );
     }
     // if(habito.recorrencia == 'd'){
 
@@ -281,9 +289,12 @@ const HabitCheckBox = ({ habito }: Props) => {
     // }
   }
 
-  function verificaQuebraMetas(diasSeguidos : number) {
-    if(diasSeguidos > 7){
-      handleCreateNewNews('n', `${user?.name} encerrou ${diasSeguidos} realizações: ${habito.titulo}`);
+  function verificaQuebraMetas(diasSeguidos: number) {
+    if (diasSeguidos > 7) {
+      handleCreateNewNews(
+        "n",
+        `${user?.name} encerrou ${diasSeguidos} realizações: ${habito.titulo}`
+      );
     }
   }
 
@@ -306,7 +317,7 @@ const HabitCheckBox = ({ habito }: Props) => {
       }
 
       atualizaHabito();
-      atualizaPontuacao();
+      atualizaPontuacaoAndBonus();
       setIsUpdatedToday(true);
       console.log("Realizacao criada com sucesso");
     } catch (error) {
@@ -316,7 +327,7 @@ const HabitCheckBox = ({ habito }: Props) => {
     }
   }
 
-  async function handleCreateNewNews(tipo : string, descricao: string) {
+  async function handleCreateNewNews(tipo: string, descricao: string) {
     try {
       const now = new Date();
       const data = {
@@ -326,7 +337,7 @@ const HabitCheckBox = ({ habito }: Props) => {
         comentarios: 0,
         reacoes: 0,
         tipo: tipo,
-        descricao : descricao
+        descricao: descricao,
       };
 
       const dbRef = collection(db, "news");
@@ -340,21 +351,39 @@ const HabitCheckBox = ({ habito }: Props) => {
     }
   }
 
-  return (
-    <View style={[styles.container, styles.shadowProp]}>
-      <TouchableOpacity onPress={() => {
-        navigation.navigate('Goals', {
-            habito: habito
-        });
+  function calculaBonus() {
+    let bonus = user?.bonus ?? 1;
+    if (habito.powerup) {
+        bonus = parseFloat((bonus + 0.05).toFixed(2));
+    }
+    return bonus;
+  }
 
-      }}>
-      <View style={styles.boxText}>
-        <Text style={styles.text}>{habito.titulo}</Text>
-        <View style={styles.boxTextItem}>
-          <Text style={styles.textTime}>Contador: {habito.contador}</Text>
-          <Text style={styles.textTime}>Sequência: {habito.diasSeguidos}</Text>
+  return (
+    <View
+      style={
+        habito.powerup
+          ? [styles.container, styles.shadowProp, styles.containerPower]
+          : [styles.container, styles.shadowProp, styles.containerNotPower]
+      }
+    >
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("Goals", {
+            habito: habito,
+          });
+        }}
+      >
+        <View style={styles.boxText}>
+          <Text style={styles.text}>{habito.titulo}</Text>
+          <View style={styles.boxTextItem}>
+            <Text style={styles.textTime}>Contador: {habito.contador}</Text>
+            <Text style={styles.textTime}>
+              Sequência: {habito.diasSeguidos}
+            </Text>
+            <Text style={styles.textTime}>Horário: {habito.horario}</Text>
+          </View>
         </View>
-      </View>
       </TouchableOpacity>
       <Checkbox
         status={checked || isUpdatedToday ? "checked" : "unchecked"}

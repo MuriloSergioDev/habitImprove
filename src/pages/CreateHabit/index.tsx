@@ -109,6 +109,7 @@ const CreateHabit = ({route}: any) => {
             diasSeguidos: habito.diasSeguidos ?? '',
             dataUltimaRealizacao : null,
             dataCriacao : new Date(),
+            powerup : false,
             uid: user?.uid ?? '',
         }
         console.log(data);

@@ -23,6 +23,7 @@ export interface HabitoInterface {
     diasDaSemana?: Array<string>,
     diaMes?: number,
     metas ?:Array<string>,
+    powerup ?: boolean,
     uid?: string
 }
 
@@ -32,6 +33,7 @@ export interface UserInterface {
     email ?: string
     password ?: string
     pontuacao : number
+    bonus : number
 }
 
 export interface DesempenhoInterface {

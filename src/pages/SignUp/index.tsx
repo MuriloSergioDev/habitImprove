@@ -1,14 +1,14 @@
 import { AntDesign, Foundation } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { doc, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import AlertModal from '../../components/AlertModal';
 import Button from '../../components/Button';
 import { auth, db } from '../../config/Firebase';
-import { UserInterface } from '../../interface/interface';
+import { HabitoInterface, UserInterface } from '../../interface/interface';
 import styles from './styles';
 
 type Props = {
@@ -26,8 +26,43 @@ const SignUp = ({ }: Props) => {
             name: '',
             email: '',
             password: '',
+            pontuacao: 0,
+            bonus: 1,
         }
     )
+
+    const hoje = new Date();
+    hoje.setHours(8);
+    hoje.setMinutes(0);
+    hoje.setSeconds(0);
+    hoje.setMilliseconds(0);
+
+    const habito3 : HabitoInterface = {
+        titulo: "8h de sono",
+        horario: hoje,
+        recorrencia: "d",
+        diasDaSemana: [],
+        contador: '0',
+        diasSeguidos: '0',
+    };
+
+    const habito2 : HabitoInterface = {
+        titulo: "10 min cardio",
+        horario: hoje,
+        recorrencia: "d",
+        diasDaSemana: [],
+        contador: '0',
+        diasSeguidos: '0',
+    };
+
+    const habito1 : HabitoInterface = {
+        titulo: "Comer uma maça",
+        horario: hoje,
+        recorrencia: "d",
+        diasDaSemana: [],
+        contador: '0',
+        diasSeguidos: '0',
+    };
 
     async function handleSignUp() {
 
@@ -45,10 +80,15 @@ const SignUp = ({ }: Props) => {
                         email: user.email,
                         password: user.password,
                         pontuacao: 0,
+                        bonus: 1,
                     }
 
                     const docRef = doc(db, "users", response.user.uid);
                     setDoc(docRef, data, { merge: true });
+
+                    handleCreateNewHabito(response.user.uid, habito1);
+                    handleCreateNewHabito(response.user.uid, habito2);
+                    handleCreateNewHabito(response.user.uid, habito3);
 
                     setMessageAlert('Cadastro realizado com sucesso')
                     setModalAlertVisible(true)
@@ -66,6 +106,36 @@ const SignUp = ({ }: Props) => {
         }
 
     }
+
+    async function handleCreateNewHabito(uid: string , habito: HabitoInterface) {
+        try {
+          if (habito.titulo) {
+
+            const data = {
+                titulo: habito.titulo ?? '',
+                horario: habito.horario ?? '',
+                recorrencia: habito.recorrencia ?? '',
+                diasDaSemana: habito.diasDaSemana ?? '',
+                diaMes: habito.diaMes ?? '',
+                contador: habito.contador ?? '',
+                diasSeguidos: habito.diasSeguidos ?? '',
+                dataUltimaRealizacao : null,
+                dataCriacao : new Date(),
+                powerup : true,
+                uid: uid,
+            }
+            console.log(data);
+
+
+            const dbRef = collection(db, "habits");
+            addDoc(dbRef, data)
+          } else {
+          }
+        } catch (error) {
+          console.log(error);
+          //alert(error)
+        }
+      }
 
     function navigateBack() {
         navigation.goBack();
