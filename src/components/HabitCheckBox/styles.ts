@@ -37,7 +37,7 @@ export default StyleSheet.create({
         shadowOffset: {width: -2, height: 4},
         shadowOpacity: 0.2,
         shadowRadius: 20,
-        elevation: 3,
+        elevation: 4,
     },
     boxText:{
         alignItems:'flex-start',
@@ -49,5 +49,33 @@ export default StyleSheet.create({
         marginTop: 10,
         marginLeft: 10,
         justifyContent: 'space-around',
+    },
+    deleteAction: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'red',
+        padding: 10,
+        width: 100,
+        height: Dimensions.get('window').width / 4,
+    },
+    editAction: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#F0D65D',
+        padding: 10,
+        width: 100,
+        height: Dimensions.get('window').width / 4,
+    },
+    boxAction: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textAction: {
+        color: 'white'
+    },
+    containerTeste: {
+        height: Dimensions.get('window').width / 3,
+        alignItems: 'center',
     }
 });

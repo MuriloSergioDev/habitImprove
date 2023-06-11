@@ -12,6 +12,7 @@ import TabCreate from "../components/TabCreate";
 import ChatRede from "../pages/ChatRede";
 import CreateHabit from "../pages/CreateHabit";
 import CreateReward from "../pages/CreateReward";
+import EditHabit from "../pages/EditHabit";
 import Estatisticas from "../pages/Estatisticas";
 import Goals from "../pages/Goals";
 import Menu from "../pages/Menu";
@@ -38,6 +39,12 @@ const AuthRoutes = () => {
           component={Goals}
           initialParams={{ habito: undefined }}
         />
+
+      <MenuStack.Screen
+          name="EditHabit"
+          component={EditHabit}
+          initialParams={{ habit: undefined }}
+        />
       </MenuStack.Navigator>
     );
   }
@@ -51,7 +58,7 @@ const AuthRoutes = () => {
         <CreateHabitStack.Screen
           name="CreateHabit"
           component={CreateHabit}
-          initialParams={{ id: undefined }}
+          initialParams={{ id: undefined}}
         />
       </CreateHabitStack.Navigator>
     );

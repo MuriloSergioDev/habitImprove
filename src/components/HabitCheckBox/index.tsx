@@ -1,7 +1,9 @@
+import { AntDesign, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -11,7 +13,7 @@ import {
 } from "firebase/firestore";
 import React, { useContext, useEffect } from "react";
 import { Alert, Text, View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { Swipeable, TouchableOpacity } from "react-native-gesture-handler";
 import { Checkbox } from "react-native-paper";
 import { db } from "../../config/Firebase";
 import AuthContext from "../../context/auth";
@@ -258,7 +260,9 @@ const HabitCheckBox = ({ habito }: Props) => {
     let pontuacao = 0;
     if (user) {
       pontuacao = user.pontuacao;
-      pontuacao = pontuacao + (1 + 0.25 * parseInt(habito.diasSeguidos ?? 0)) * user.bonus;
+      pontuacao =
+        pontuacao +
+        (1 + 0.25 * parseInt(habito.diasSeguidos ?? 0)) * user.bonus;
     }
     return pontuacao;
   }
@@ -354,54 +358,136 @@ const HabitCheckBox = ({ habito }: Props) => {
   function calculaBonus() {
     let bonus = user?.bonus ?? 1;
     if (habito.powerup) {
-        bonus = parseFloat((bonus + 0.05).toFixed(2));
+      bonus = parseFloat((bonus + 0.05).toFixed(2));
     }
     return bonus;
   }
 
-  return (
-    <View
-      style={
-        habito.powerup
-          ? [styles.container, styles.shadowProp, styles.containerPower]
-          : [styles.container, styles.shadowProp, styles.containerNotPower]
-      }
-    >
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate("Goals", {
-            habito: habito,
-          });
-        }}
-      >
-        <View style={styles.boxText}>
-          <Text style={styles.text}>{habito.titulo}</Text>
-          <View style={styles.boxTextItem}>
-            <Text style={styles.textTime}>Contador: {habito.contador}</Text>
-            <Text style={styles.textTime}>
-              Sequência: {habito.diasSeguidos}
-            </Text>
-            <Text style={styles.textTime}>Horário: {habito.horario}</Text>
+  function handleHabitoDelete() {
+    console.log("deletar aluno");
+
+    // Works on both Android and iOS
+    Alert.alert(
+      "Deseja mesmo excluir o hábito?",
+      "",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            const docRef = doc(db, "habits", habito.id ?? "");
+            await deleteDoc(docRef)
+              .then(() => {
+                console.log("Document successfully deleted!");
+                Alert.alert(
+                  "Sucesso",
+                  `Hábito excluido com sucesso`,
+                  [{ text: "Ok", onPress: () => {} }],
+                  { cancelable: true }
+                );
+              })
+              .catch((error) => {
+                console.error("Error deleting document:", error);
+                Alert.alert(
+                  "Erro",
+                  `Erro ao excluir hábito`,
+                  [{ text: "Ok", onPress: () => {} }],
+                  { cancelable: true }
+                );
+              });
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }
+
+  function handleHabitoEdit() {
+    navigation.navigate("EditHabit", {
+      habit: habito,
+    });
+  }
+
+  function rightActions(progress: any, dragX: any) {
+    return (
+      <View style={styles.boxAction}>
+        <TouchableOpacity
+          onPress={() => {
+            handleHabitoDelete();
+          }}
+        >
+          <View style={styles.deleteAction}>
+            <Text style={styles.textAction}>Excluir</Text>
+            <Feather name="trash-2" size={20} color="white" />
           </View>
-        </View>
-      </TouchableOpacity>
-      <Checkbox
-        status={checked || isUpdatedToday ? "checked" : "unchecked"}
-        onPress={() => {
-          if (!isUpdatedToday) {
-            handleCreateNewRealizacao();
-            setChecked(!checked);
-          } else {
-            Alert.alert(
-              "Atenção",
-              "Habito já foi realizado hoje",
-              [{ text: "Ok", onPress: () => {} }],
-              { cancelable: true }
-            );
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            handleHabitoEdit();
+          }}
+        >
+          <View style={styles.editAction}>
+            <Text style={styles.textAction}>Editar</Text>
+            <AntDesign name="edit" size={20} color="white" />
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <Swipeable renderLeftActions={rightActions} overshootLeft={false}>
+      <View style={styles.containerTeste}>
+        <View
+          style={
+            habito.powerup
+              ? [styles.container, styles.shadowProp, styles.containerPower]
+              : [styles.container, styles.shadowProp, styles.containerNotPower]
           }
-        }}
-      />
-    </View>
+        >
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Goals", {
+                habito: habito,
+              });
+            }}
+          >
+            <View style={styles.boxText}>
+              <Text style={styles.text}>{habito.titulo}</Text>
+              <View style={styles.boxTextItem}>
+                <Text style={styles.textTime}>Contador: {habito.contador}</Text>
+                <Text style={styles.textTime}>
+                  Sequência: {habito.diasSeguidos}
+                </Text>
+                <Text style={styles.textTime}>Horário: {habito.horario}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <Checkbox
+            status={checked || isUpdatedToday ? "checked" : "unchecked"}
+            onPress={() => {
+              if (!isUpdatedToday) {
+                handleCreateNewRealizacao();
+                setChecked(!checked);
+              } else {
+                Alert.alert(
+                  "Atenção",
+                  "Habito já foi realizado hoje",
+                  [{ text: "Ok", onPress: () => {} }],
+                  { cancelable: true }
+                );
+              }
+            }}
+          />
+        </View>
+      </View>
+    </Swipeable>
   );
 };
 

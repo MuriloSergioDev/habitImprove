@@ -45,7 +45,7 @@ const TagInput = ({initialTags, onTagsChange}: any) => {
         <TextInput
           value={inputValue}
           onChangeText={setInputValue}
-          placeholder="Adcione metas de realizações"
+          placeholder="Adicione metas de realizações"
           onSubmitEditing={handleAddTag}
           style={{
             borderWidth: 1,

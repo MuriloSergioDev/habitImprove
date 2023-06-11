@@ -2,7 +2,7 @@ import { AntDesign, Feather, Foundation } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from "@react-navigation/native";
-import { addDoc, collection } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useContext, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -15,20 +15,25 @@ import { HabitoInterface } from "../../interface/interface";
 import styles from "./styles";
 
 
-const CreateHabit = ({route}: any) => {
+const EditHabit = ({route}: any) => {
   const navigation = useNavigation<any>();
 
-  const { id } = route.params
+  const { habit } = route.params
   const { user, signed, logOut } = useContext(AuthContext);
   const [messageAlert, setMessageAlert] = useState("");
   const [modalAlertVisible, setModalAlertVisible] = useState(false);
+  let dataHorario = new Date();
+  const horaMinuto = habit.horario.split(":");
+  dataHorario.setHours(horaMinuto[0]);
+  dataHorario.setMinutes(horaMinuto[1]);
   const [habito, setHabito] = useState<HabitoInterface>({
-    titulo: "",
-    horario: new Date(),
-    recorrencia: "d",
-    diasDaSemana: [],
-    contador: '0',
-    diasSeguidos: '0',
+    titulo: habit.titulo ?? "",
+    horario: dataHorario,
+    recorrencia: habit.recorrencia ?? "d",
+    diasDaSemana: habit.diasDaSemana ?? [],
+    contador: habit.contador ?? "0",
+    diasSeguidos: habit.diasSeguidos ?? "0",
+    diaMes: habit.diaMes ?? "",
   });
 
   const days = Array.from({ length: 31 }, (_, i) => ({
@@ -38,7 +43,7 @@ const CreateHabit = ({route}: any) => {
   const filteredDays = days.filter((day) => parseInt(day.value) <= 28);
 
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [showTime, setShowTime] = useState(false);
+  const [showTime, setShowTime] = useState(true);
   const [daysOfWeek, setDaysOfWeek] = useState([
     { name: "Domingo", selected: false },
     { name: "Segunda", selected: false },
@@ -89,68 +94,20 @@ const CreateHabit = ({route}: any) => {
     handleDaysOfWeekChange(daysOfWeek);
   }, [daysOfWeek]);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      // Função para redefinir os campos
-      function resetFields() {
-        setHabito({
-          titulo: "",
-          horario: new Date(),
-          recorrencia: "d",
-          diasDaSemana: [],
-          contador: '0',
-          diasSeguidos: '0',
-        });
-        setShowTime(false);
-        setDaysOfWeek([
-          { name: "Domingo", selected: false },
-          { name: "Segunda", selected: false },
-          { name: "Terça", selected: false },
-          { name: "Quarta", selected: false },
-          { name: "Quinta", selected: false },
-          { name: "Sexta", selected: false },
-          { name: "Sábado", selected: false },
-        ]);
-      }
-
-      // Redefinir os campos ao entrar na tela
-      resetFields();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  async function handleCreateNewHabito() {
+  async function handleUpdateHabito() {
     try {
       if (habito.titulo) {
 
-        const data = {
-            titulo: habito.titulo ?? '',
-            horario: habito.horario ?? '',
-            recorrencia: habito.recorrencia ?? '',
-            diasDaSemana: habito.diasDaSemana ?? '',
-            diaMes: habito.diaMes ?? '',
-            contador: habito.contador ?? '',
-            diasSeguidos: habito.diasSeguidos ?? '',
-            dataUltimaRealizacao : null,
-            dataCriacao : new Date(),
-            powerup : false,
-            uid: user?.uid ?? '',
-        }
-        console.log(data);
+        await atualizaHabito();
 
-
-        const dbRef = collection(db, "habits");
-        addDoc(dbRef, data)
-
-        setMessageAlert("Hábito criado com sucesso");
+        setMessageAlert("Hábito atualizado com sucesso");
         setModalAlertVisible(true);
       } else {
         setMessageAlert("Preencha todos os campos");
         setModalAlertVisible(true);
       }
     } catch (error) {
-      setMessageAlert("Erro ao criar hábito");
+      setMessageAlert("Erro ao atualizar hábito");
       setModalAlertVisible(true);
       console.log(error);
 
@@ -158,8 +115,28 @@ const CreateHabit = ({route}: any) => {
     }
   }
 
+  async function atualizaHabito() {
+    try {
+      const docRef = doc(db, "habits", habit.id ?? "");
+      let data = await getDoc(docRef).then((doc: any): HabitoInterface => {
+        return doc.data();
+      });
+
+      data.titulo = habito.titulo;
+      data.horario = habito.horario;
+      data.recorrencia = habito.recorrencia;
+      data.diasDaSemana = habito.diasDaSemana;
+      data.diaMes = habito.diaMes;
+
+      await setDoc(docRef, data);
+    } catch (error) {
+      console.log("Erro ao atualizar habito");
+      console.log(error);
+    }
+  }
+
   let modalIcon =
-    messageAlert == "Hábito criado com sucesso" ? (
+    messageAlert == "Hábito atualizado com sucesso" ? (
       <AntDesign name="checkcircle" size={24} color="green" />
     ) : (
       <Foundation name="alert" size={24} color="#e6d927" />
@@ -177,7 +154,7 @@ const CreateHabit = ({route}: any) => {
               navigateBack();
             }}
           />
-          <Text style={styles.navUpText}>Novo Hábito</Text>
+          <Text style={styles.navUpText}>Editar Hábito</Text>
         </View>
       </View>
 
@@ -187,7 +164,7 @@ const CreateHabit = ({route}: any) => {
         isVisible={modalAlertVisible}
         close={() => {
           setModalAlertVisible(false);
-          if (messageAlert == "Hábito criado com sucesso") {
+          if (messageAlert == "Hábito atualizado com sucesso") {
             navigateToMenu();
           }
         }}
@@ -310,7 +287,7 @@ const CreateHabit = ({route}: any) => {
           textColor="white"
           label="Salvar"
           onPress={() => {
-            handleCreateNewHabito();
+            handleUpdateHabito();
           }}
         ></Button>
       </View>
@@ -318,4 +295,4 @@ const CreateHabit = ({route}: any) => {
   );
 };
 
-export default CreateHabit;
+export default EditHabit;
